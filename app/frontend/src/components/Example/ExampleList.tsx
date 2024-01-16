@@ -11,9 +11,9 @@ export type ExampleModel = {
 };
 
 const EXAMPLES: ExampleModel[] = [
-    { text: "What are the steps I need to take to discontinue a case?", value: "What are the steps I need to take to discontinue a case?" },
-    { text: "What systems are required for issuing a discontinuance?", value: "What systems are required for issuing a discontinuance?" },
-    { text: "What do I need to do if there are co-defendants?", value: "What do I need to do if there are co-defendants?" }
+    { text: "How do I result breach of bail?", value: "How do I result breach of bail?" },
+    { text: "How do I result a bail appeal?", value: "How do I result a bail appeal?" },
+    { text: "How do I amend my result as I made an error?", value: "How do I amend my result as I made an error?" }
 ];
 
 interface Props {
