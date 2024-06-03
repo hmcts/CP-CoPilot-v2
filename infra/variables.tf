@@ -40,7 +40,7 @@ variable "cuaId" {
 
 variable "requireWebsiteSecurityMembership" {
   type    = bool
-  default = false
+  default = true
 }
 
 variable "enableBingSafeSearch" {
@@ -50,7 +50,7 @@ variable "enableBingSafeSearch" {
 
 variable "enableWebChat" {
   type    = bool
-  default = true
+  default = false
 }
 
 variable "enableUngroundedChat" {
@@ -60,12 +60,12 @@ variable "enableUngroundedChat" {
 
 variable "enableMathAssitant" {
   type    = bool
-  default = true
+  default = false
 }
 
 variable "enableTabularDataAssistant" {
   type    = bool
-  default = true
+  default = false
 }
 
 variable "enableSharePointConnector" {
@@ -145,12 +145,12 @@ variable "isInAutomation" {
 
 variable "aadWebClientId" {
   type    = string
-  default = ""
+  default = "b170abb5-0750-43ca-8d87-c1abd8e51efd" // innovation-pov-appreg1
 }
 
 variable "aadMgmtClientId" {
   type    = string
-  default = ""
+  default = "b454fd6c-1e3a-4215-9491-694461455bdc" // innovation-pov-appreg2
 }
 
 variable "aadMgmtClientSecret" {
@@ -161,7 +161,7 @@ variable "aadMgmtClientSecret" {
 
 variable "aadMgmtServicePrincipalId" {
   type = string
-  default = ""
+  default = "fbd40373-ae31-423f-b141-7b35a0de2668" // innovation-pov-appreg1
 }
 ////
 
@@ -232,7 +232,7 @@ variable "sentenceTransformerEmbeddingVectorSize" {
 
 variable "embeddingsDeploymentCapacity" {
   type    = number
-  default = 240
+  default = 120
 }
 ////
 
@@ -249,13 +249,13 @@ variable "appServicePlanName" {
 variable "appServiceSkuSize" {
   description = "The size of the app service plan for the IA website. Must match with the tier value in appServiceSkuTier."
   type = string
-  default = "S1"
+  default = "B2"
 }
 
 variable "appServiceSkuTier" {
   description = "The tier of the app service plan for the IA website. Must match with the size value in appServiceSkuSize."
   type = string
-  default = "Standard"
+  default = "Basic"
   
 }
 
@@ -267,13 +267,13 @@ variable "enrichmentAppServicePlanName" {
 variable "enrichmentAppServiceSkuSize" {
   description = "The size of the app service plan for the enrichment service. Must match with the tier value in enrichmentAppServiceSkuTier."
   type = string
-  default = "P2v3"
+  default = "B2"
 }
 
 variable "enrichmentAppServiceSkuTier" {
   description = "The tier of the app service plan for the enrichment service. Must match with the size value in enrichmentAppServiceSkuSize."
   type = string
-  default = "PremiumV3"
+  default = "Basic"
 }
 
 variable "logAnalyticsName" {
@@ -304,13 +304,13 @@ variable "functionsAppName" {
 variable "functionsAppSkuSize" {
   description = "The size of the app service plan for the functions app. Must match with the tier value in functionsAppSkuTier."
   type = string
-  default = "S2"
+  default = "B2"
 }
 
 variable "functionsAppSkuTier" {
   description = "The tier of the app service plan for the functions app. Must match with the size value in functionsAppSkuSize."
   type = string
-  default = "Standard"
+  default = "Basic"
 }
 
 variable "videoIndexerName" {
@@ -370,7 +370,7 @@ variable "chatGptModelVersion" {
 
 variable "chatGptDeploymentCapacity" {
   type    = number
-  default = 240
+  default = 120
 }
 
 variable "chunkTargetSize" {

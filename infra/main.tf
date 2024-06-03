@@ -1,5 +1,6 @@
 locals {
-  tags            = { ProjectName = "Information Assistant", BuildNumber = var.buildNumber }
+  // tags            = { ProjectName = "Information Assistant", BuildNumber = var.buildNumber }
+  tags            = { ProjectName = "Knowledge Genie", environment = "sandbox", application = "core", businessArea = "Cross-Cutting", expiresAfter = "2024-12-30", builtFrom = "https://github.com/hmcts/CP-CoPilot-v2", owner = "Nitesh Soni" }
   azure_roles     = jsondecode(file("${path.module}/azure_roles.json"))
   selected_roles  = ["CognitiveServicesOpenAIUser", "StorageBlobDataReader", "StorageBlobDataContributor", "SearchIndexDataReader", "SearchIndexDataContributor"]
 }

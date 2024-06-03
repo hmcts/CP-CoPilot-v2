@@ -7,7 +7,7 @@ locals {
 
 
 resource "azuread_application" "aad_web_app" {
-  count                         = var.isInAutomation ? 0 : 1
+  count                         = 0 // var.isInAutomation ? 0 : 1
   display_name                  = "infoasst_web_access_${var.randomString}"
   identifier_uris               = ["api://infoasst-${var.randomString}"]
   owners                        = local.owner_ids
@@ -25,14 +25,14 @@ resource "azuread_application" "aad_web_app" {
 
 
 resource "azuread_service_principal" "aad_web_sp" {
-  count                         = var.isInAutomation ? 0 : 1
+  count                         = 0 // var.isInAutomation ? 0 : 1
   client_id                     = azuread_application.aad_web_app[0].client_id
   app_role_assignment_required  = var.requireWebsiteSecurityMembership
   owners                        = local.owner_ids
 }
 
 resource "azuread_application" "aad_mgmt_app" {
-  count             = var.isInAutomation ? 0 : 1
+  count             = 0 // var.isInAutomation ? 0 : 1
   display_name      = "infoasst_mgmt_access_${var.randomString}"
   owners            = local.owner_ids
   sign_in_audience  = "AzureADMyOrg"
@@ -40,34 +40,34 @@ resource "azuread_application" "aad_mgmt_app" {
 }
 
 resource "azuread_application_password" "aad_mgmt_app_password" {
-  count           = var.isInAutomation ? 0 : 1
+  count           = 0 // var.isInAutomation ? 0 : 1
   application_id  = azuread_application.aad_mgmt_app[0].id
   display_name    = "infoasst-mgmt"
   end_date_relative = "${var.password_lifetime * 24}h"
 }
 
 resource "azuread_service_principal" "aad_mgmt_sp" {
-  count     = var.isInAutomation ? 0 : 1
+  count     = 0 // var.isInAutomation ? 0 : 1
   client_id = azuread_application.aad_mgmt_app[0].client_id
   owners    = local.owner_ids
 }
 
 output "azure_ad_web_app_client_id" {
-  value       = var.isInAutomation ? var.aadWebClientId : azuread_application.aad_web_app[0].client_id
+  value       = var.aadWebClientId // var.isInAutomation ? var.aadWebClientId : azuread_application.aad_web_app[0].client_id
   description = "Client ID of the Azure AD Web App"
 }
 
 output "azure_ad_mgmt_app_client_id" {
-  value       = var.isInAutomation ? var.aadMgmtClientId : azuread_application.aad_mgmt_app[0].client_id
+  value       = var.aadMgmtClientId // var.isInAutomation ? var.aadMgmtClientId : azuread_application.aad_mgmt_app[0].client_id
   description = "Client ID of the Azure AD Management App"
 }
 
 output "azure_ad_mgmt_sp_id" {
-  value       = var.isInAutomation ? var.aadMgmtServicePrincipalId : azuread_service_principal.aad_mgmt_sp[0].id
+  value       = var.aadMgmtServicePrincipalId // var.isInAutomation ? var.aadMgmtServicePrincipalId : azuread_service_principal.aad_mgmt_sp[0].id
   description = "Service Principal ID of the Azure AD Management App"
 }
 
 output "azure_ad_mgmt_app_secret" {
-  value       = var.isInAutomation ? var.aadMgmtClientSecret : azuread_application_password.aad_mgmt_app_password[0].value
+  value       = var.aadMgmtClientSecret // var.isInAutomation ? var.aadMgmtClientSecret : azuread_application_password.aad_mgmt_app_password[0].value
   description = "Secret of the Azure AD Management App"
 }
