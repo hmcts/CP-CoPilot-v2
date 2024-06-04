@@ -31,9 +31,9 @@ import React from "react";
 const Chat = () => {
     const [isConfigPanelOpen, setIsConfigPanelOpen] = useState(false);
     const [isInfoPanelOpen, setIsInfoPanelOpen] = useState(false);
-    const [retrieveCount, setRetrieveCount] = useState<number>(5);
-    const [useSuggestFollowupQuestions, setUseSuggestFollowupQuestions] = useState<boolean>(false);
-    const [userPersona, setUserPersona] = useState<string>("analyst");
+    const [retrieveCount, setRetrieveCount] = useState<number>(10);
+    const [useSuggestFollowupQuestions, setUseSuggestFollowupQuestions] = useState<boolean>(true);
+    const [userPersona, setUserPersona] = useState<string>("system");
     const [systemPersona, setSystemPersona] = useState<string>("an Assistant");
     // Setting responseLength to 2048 by default, this will effect the default display of the ResponseLengthButtonGroup below.
     // It must match a valid value of one of the buttons in the ResponseLengthButtonGroup.tsx file. 
@@ -355,7 +355,7 @@ const Chat = () => {
                                     <div className={styles.chatEmptyStateHeader}> 
                                         <BuildingMultipleFilled fontSize={"100px"} primaryFill={"rgba(27, 74, 239, 1)"} aria-hidden="true" aria-label="Chat with your Work Data logo" />
                                         </div>
-                                    <h1 className={styles.chatEmptyStateTitle}>Chat with your work data</h1>
+                                    <h1 className={styles.chatEmptyStateTitle}>Welcome to Common Platform Knowledge Genie</h1>
                                 </div>
                             : activeChatMode == ChatMode.WorkPlusWeb ?
                                 <div>
@@ -373,11 +373,13 @@ const Chat = () => {
                                 </div>
                             }
                             <span className={styles.chatEmptyObjectives}>
-                                <i>Information Assistant uses AI. Check for mistakes.   </i><a href="https://github.com/microsoft/PubSec-Info-Assistant/blob/main/docs/transparency.md" target="_blank" rel="noopener noreferrer">Transparency Note</a>
+                                <i>Knowledge Genie AI (Artificial Intelligence) gives Common Platform Users a way of searching Common Platform knowledge stores to quickly and easily access the latest up to date Common Platform job guidance. <br />HMCTS is committed to the responsible use of AI. Our 9 principles guide the use of AI to make sure it is appropriate, safe and controlled.&nbsp;</i>
+                                <a href="https://intranet.justice.gov.uk/documents/2024/03/hmcts-responsible-ai-approach.pdf/" target="_blank" rel="noopener noreferrer">Responsible AI Approach</a><br/><br/>
+                                {/* <a href="https://github.com/microsoft/PubSec-Info-Assistant/blob/main/docs/transparency.md" target="_blank" rel="noopener noreferrer">Transparency Note</a> */}
                             </span>
                             {activeChatMode != ChatMode.Ungrounded &&
                                 <div>
-                                    <h2 className={styles.chatEmptyStateSubtitle}>Ask anything or try an example</h2>
+                                    <h2 className={styles.chatEmptyStateSubtitle}>To access Common Platform guidance, click on one of the FAQs or ask your question in the dialogue box below</h2>
                                     <ExampleList onExampleClicked={onExampleClicked} />
                                 </div>
                             }
@@ -438,7 +440,7 @@ const Chat = () => {
                         )}
                         <QuestionInput
                             clearOnSend
-                            placeholder="Type a new question (e.g. Who are Microsoft's top executives, provided as a table?)"
+                            placeholder="Type a new question (e.g. How do I discontinue a case?)"
                             disabled={isLoading}
                             onSend={question => makeApiRequest(question, defaultApproach, {}, {}, {})}
                             onAdjustClick={() => setIsConfigPanelOpen(!isConfigPanelOpen)}

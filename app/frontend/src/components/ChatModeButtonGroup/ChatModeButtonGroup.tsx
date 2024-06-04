@@ -38,7 +38,7 @@ export const ChatModeButtonGroup = ({ className, onClick, defaultValue, featureF
                 </ButtonGroup>
             : // If neither WorkPlusWeb nor Ungrounded are enabled, show only WorkOnly button
                 <ButtonGroup className={`${styles.buttonGroup}`} onClick={onClick} bsPrefix="ia">
-                    <Button className={`${defaultValue == ChatMode.WorkOnly? styles.buttonmiddleactive : styles.buttonmiddle ?? ""}`} size="sm" value={0} bsPrefix='ia'>{"Work Only"}</Button>
+                    <Button className={`${defaultValue == ChatMode.WorkOnly? styles.buttonmiddleactive : styles.buttonmiddle ?? ""}`} size="sm" value={0} bsPrefix='ia'>{"Common Platform Guidance Only"}</Button>
                 </ButtonGroup>
                 }
         </div>

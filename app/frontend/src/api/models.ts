@@ -217,3 +217,10 @@ export type GetFeatureFlagsResponse = {
     ENABLE_MULTIMEDIA: boolean;
     error?: string;
 }
+
+export type GetWhoAmIResponse = {
+    USER_NAME: string;
+    USER_ROLES: string;
+    USER_ID: string;
+    error?: string;
+};

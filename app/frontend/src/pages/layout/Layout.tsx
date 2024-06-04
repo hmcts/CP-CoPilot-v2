@@ -42,11 +42,13 @@ export const Layout = () => {
                                     Chat
                                 </NavLink>
                             </li>
-                            <li className={styles.headerNavLeftMargin}>
-                                <NavLink to="/content" className={({ isActive }) => (isActive ? styles.headerNavPageLinkActive : styles.headerNavPageLink)}>
-                                    Manage Content
-                                </NavLink>
-                            </li>
+                            {false &&
+                                <li className={styles.headerNavLeftMargin}>
+                                    <NavLink to="/content" className={({ isActive }) => (isActive ? styles.headerNavPageLinkActive : styles.headerNavPageLink)}>
+                                        Manage Content
+                                    </NavLink>
+                                </li>
+                            }
                             {featureFlags?.ENABLE_MATH_ASSISTANT &&
                                 <li className={styles.headerNavLeftMargin}>
                                     <NavLink to="/tutor" className={({ isActive }) => (isActive ? styles.headerNavPageLinkActive : styles.headerNavPageLink)}>
