@@ -7,10 +7,12 @@ import { WarningBanner } from "../../components/WarningBanner/WarningBanner";
 import styles from "./Layout.module.css";
 import { Title } from "../../components/Title/Title";
 import { getFeatureFlags, GetFeatureFlagsResponse } from "../../api";
+import { GetWhoAmIResponse } from "../../api";
 import { useEffect, useState } from "react";
 
 export const Layout = () => {
     const [featureFlags, setFeatureFlags] = useState<GetFeatureFlagsResponse | null>(null);
+    const [whoAmIData, setWhoAmIData] = useState<GetWhoAmIResponse | null>(null);
 
     async function fetchFeatureFlags() {
         try {
@@ -22,8 +24,32 @@ export const Layout = () => {
         }
     }
 
+    async function fetchWhoAmIData() {
+        try {
+            //console.log("fetchedWhoAmIData");
+            const response = await fetch("/.auth/me", {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
+            const fetchedWhoAmIData = await response.json();
+            //console.log(fetchedWhoAmIData);
+            const user_name = fetchedWhoAmIData[0].user_claims.filter(function(el: any){return el.typ == "name"})[0].val;
+            const user_roles = fetchedWhoAmIData[0].user_claims.filter(function(el: any){return el.typ == "roles"})[0].val;
+            const user_id = fetchedWhoAmIData[0].user_claims.filter(function(el: any){return el.typ == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"})[0].val;
+
+            setWhoAmIData({USER_NAME: user_name, USER_ROLES: user_roles, USER_ID: user_id});
+
+        } catch (error) {
+            // Handle the error here
+            console.log(error);
+        }
+    }
+
     useEffect(() => {
         fetchFeatureFlags();
+        fetchWhoAmIData();
     }, []);
 
     return (
@@ -42,7 +68,7 @@ export const Layout = () => {
                                     Chat
                                 </NavLink>
                             </li>
-                            {false &&
+                            {whoAmIData?.USER_ROLES == "Admin" &&
                                 <li className={styles.headerNavLeftMargin}>
                                     <NavLink to="/content" className={({ isActive }) => (isActive ? styles.headerNavPageLinkActive : styles.headerNavPageLink)}>
                                         Manage Content

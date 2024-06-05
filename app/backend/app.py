@@ -849,42 +849,6 @@ async def get_feature_flags():
     }
     return response
 
-
-@app.get("/getWhoAmI")
-async def get_who_am_i():
-    """
-    Get the details for logged in user.
-
-    Returns:
-        dict: A dictionary containing various properties for the user.
-            - "USER_NAME": Logged-in User's Name.
-            - "USER_ROLES": Logged-in User's Role.
-            - "USER_ID": Logged-in User's Email / ID.
-    """
-    response = {
-        "USER_NAME": "HMCTS User",
-        "USER_ROLES": "Users",
-        "USER_ID": "",
-    }
-    try:
-        whoami = requests.get('/.auth/me')
-        json_body = whoami.json()
-
-        email = next(x for x in json_body[0]["user_claims"] if x["typ"] == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress")["val"]
-        name = next(x for x in json_body[0]["user_claims"] if x["typ"] == "name")["val"]
-        roles = next(x for x in json_body[0]["user_claims"] if x["typ"] == "roles")["val"]
-
-        response = {
-            "USER_NAME": name,
-            "USER_ROLES": roles,
-            "USER_ID": email,
-        }
-
-    except Exception as ex:
-        log.exception("Exception in /getWhoAmI")
-        raise HTTPException(status_code=500, detail=str(ex)) from ex
-    return response
-
 app.mount("/", StaticFiles(directory="static"), name="static")
 
 if __name__ == "__main__":

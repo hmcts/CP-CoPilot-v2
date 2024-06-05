@@ -17,7 +17,6 @@ import { ChatResponse,
     ResubmitItemRequest,
     GetFeatureFlagsResponse,
     getMaxCSVFileSizeType,
-    GetWhoAmIResponse,
     } from "./models";
 
 export async function chatApi(options: ChatRequest, signal: AbortSignal): Promise<Response> {
@@ -496,22 +495,6 @@ export async function getFeatureFlags(): Promise<GetFeatureFlagsResponse> {
         }
     });
     const parsedResponse: GetFeatureFlagsResponse = await response.json();
-    if (response.status > 299 || !response.ok) {
-        console.log(response);
-        throw Error(parsedResponse.error || "Unknown error");
-    }
-    console.log(parsedResponse);
-    return parsedResponse;
-}
-
-export async function GetWhoAmI(): Promise<GetWhoAmIResponse> {
-    const response = await fetch("/getWhoAmI", {
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json"
-        }
-    });
-    const parsedResponse: GetWhoAmIResponse = await response.json();
     if (response.status > 299 || !response.ok) {
         console.log(response);
         throw Error(parsedResponse.error || "Unknown error");

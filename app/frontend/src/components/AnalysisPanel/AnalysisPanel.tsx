@@ -114,23 +114,6 @@ export const AnalysisPanel = ({ answer, activeTab, activeCitation, sourceFile, p
                 headerButtonProps={isDisabledCitationTab ? pivotItemDisabledStyle : undefined}
             >
                 <Pivot className={className}>
-                    <PivotItem itemKey="indexedFile" headerText="Document Section">
-                        {activeCitationObj === undefined ? (
-                            <Text>Loading...</Text>
-                        ) : (
-                            <div>
-                                <Separator>Metadata</Separator>
-                                <Label>File Name</Label><Text>{activeCitationObj.file_name}</Text>
-                                <Label>File URI</Label><Text>{activeCitationObj.file_uri}</Text>
-                                <Label>Title</Label><Text>{activeCitationObj.title}</Text>
-                                <Label>Section</Label><Text>{activeCitationObj.section}</Text>
-                                <Label>Page Number(s)</Label><Text>{activeCitationObj.pages?.join(",")}</Text>
-                                <Label>Token Count</Label><Text>{activeCitationObj.token_count}</Text>
-                                <Separator>Content</Separator>
-                                <Label>Content</Label><Text>{activeCitationObj.content}</Text>
-                            </div>
-                        )}
-                    </PivotItem>
                     <PivotItem itemKey="rawFile" headerText="Document">
                         {["docx", "xlsx", "pptx"].includes(sourceFileExt) ? (
                             // Treat other Office formats like "xlsx" for the Office Online Viewer
@@ -147,6 +130,23 @@ export const AnalysisPanel = ({ answer, activeTab, activeCitation, sourceFile, p
                         ) : (
                             // Default to iframe for other file types
                             <iframe title="Source File" src={sourceFile} width="100%" height={citationHeight} />
+                        )}
+                    </PivotItem>
+                    <PivotItem itemKey="indexedFile" headerText="Document Section">
+                        {activeCitationObj === undefined ? (
+                            <Text>Loading...</Text>
+                        ) : (
+                            <div>
+                                <Separator>Metadata</Separator>
+                                <Label>File Name</Label><Text>{activeCitationObj.file_name}</Text>
+                                <Label>File URI</Label><Text>{activeCitationObj.file_uri}</Text>
+                                <Label>Title</Label><Text>{activeCitationObj.title}</Text>
+                                <Label>Section</Label><Text>{activeCitationObj.section}</Text>
+                                <Label>Page Number(s)</Label><Text>{activeCitationObj.pages?.join(",")}</Text>
+                                <Label>Token Count</Label><Text>{activeCitationObj.token_count}</Text>
+                                <Separator>Content</Separator>
+                                <Label>Content</Label><Text>{activeCitationObj.content}</Text>
+                            </div>
                         )}
                     </PivotItem>
                 </Pivot>
