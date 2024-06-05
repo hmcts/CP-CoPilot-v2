@@ -24,6 +24,7 @@ import { ResponseLengthButtonGroup } from "../../components/ResponseLengthButton
 import { ResponseTempButtonGroup } from "../../components/ResponseTempButtonGroup";
 import { ChatModeButtonGroup } from "../../components/ChatModeButtonGroup";
 import { InfoContent } from "../../components/InfoContent/InfoContent";
+import { FeedbackContent } from "../../components/FeedbackContent/FeedbackContent";
 import { FolderPicker } from "../../components/FolderPicker";
 import { TagPickerInline } from "../../components/TagPicker";
 import React from "react";
@@ -31,6 +32,7 @@ import React from "react";
 const Chat = () => {
     const [isConfigPanelOpen, setIsConfigPanelOpen] = useState(false);
     const [isInfoPanelOpen, setIsInfoPanelOpen] = useState(false);
+    const [isFeedbackPanelOpen, setIsFeedbackPanelOpen] = useState(false);
     const [retrieveCount, setRetrieveCount] = useState<number>(10);
     const [useSuggestFollowupQuestions, setUseSuggestFollowupQuestions] = useState<boolean>(true);
     const [userPersona, setUserPersona] = useState<string>("system");
@@ -141,7 +143,8 @@ const Chat = () => {
                     selectedTags: selectedTags.map(tag => tag.name).join(",")
                 },
                 citation_lookup: approach == Approaches.CompareWebWithWork ? web_citation_lookup : approach == Approaches.CompareWorkWithWeb ? work_citation_lookup : {},
-                thought_chain: thought_chain
+                thought_chain: thought_chain,
+                whoAmIData: whoAmIData
             };
 
             const temp: ChatResponse = {
@@ -443,6 +446,7 @@ const Chat = () => {
                                             onRagSearchClicked={() => makeApiRequest(answers[index][0], Approaches.ReadRetrieveRead, answer[1].work_citation_lookup, answer[1].web_citation_lookup, answer[1].thought_chain)}
                                             chatMode={activeChatMode}
                                             whoAmIData={whoAmIData}
+                                            onFeedbackClicked={() => setIsFeedbackPanelOpen(!isFeedbackPanelOpen)}
                                         />
                                     </div>
                                 </div>
@@ -558,6 +562,19 @@ const Chat = () => {
                     isFooterAtBottom={true}                >
                     <div className={styles.resultspanel}>
                         <InfoContent />
+                    </div>
+                </Panel>
+
+                <Panel
+                    headerText="Feedback"
+                    isOpen={isFeedbackPanelOpen}
+                    isBlocking={true}
+                    onDismiss={() => setIsFeedbackPanelOpen(false)}
+                    closeButtonAriaLabel="Close"
+                    onRenderFooterContent={() => <DefaultButton onClick={() => setIsFeedbackPanelOpen(false)}>Close</DefaultButton>}
+                    isFooterAtBottom={true}                >
+                    <div className={styles.resultspanel}>
+                        <FeedbackContent />
                     </div>
                 </Panel>
             </div>

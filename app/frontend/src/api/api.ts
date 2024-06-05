@@ -48,7 +48,8 @@ export async function chatApi(options: ChatRequest, signal: AbortSignal): Promis
                 selected_tags: options.overrides?.selectedTags
             },
             citation_lookup: options.citation_lookup,
-            thought_chain: options.thought_chain
+            thought_chain: options.thought_chain,
+            whoAmIData: options.whoAmIData
         }),
         signal: signal
     });

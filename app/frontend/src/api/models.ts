@@ -65,6 +65,7 @@ export type ChatRequest = {
     overrides?: ChatRequestOverrides;
     citation_lookup: { [key: string]: { citation: string; source_path: string; page_number: string } };
     thought_chain: { [key: string]: string };
+    whoAmIData?: GetWhoAmIResponse ;
 };
 
 export type BlobClientUrlResponse = {

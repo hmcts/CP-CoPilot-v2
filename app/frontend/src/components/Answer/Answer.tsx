@@ -35,6 +35,7 @@ interface Props {
     whoAmIData: GetWhoAmIResponse | undefined; 
     setAnswer?: (data: ChatResponse) => void;
     setError?: (data: string) => void;
+    onFeedbackClicked: () => void;
 }
 
 export const Answer = ({
@@ -55,7 +56,8 @@ export const Answer = ({
     answerStream,
     whoAmIData,
     setAnswer,
-    setError
+    setError,
+    onFeedbackClicked
 }: Props) => {
     const parsedAnswer = useMemo(() => parseAnswerToHtml(answer.answer, answer.approach, answer.work_citation_lookup, answer.web_citation_lookup, answer.thought_chain, onCitationClicked), [answer]);
 
@@ -89,6 +91,14 @@ export const Answer = ({
                                 disabled={!answer.data_points || !answer.data_points.length}
                             />
                         }
+                        <IconButton
+                            style={{ color: "black" }}
+                            iconProps={{ iconName: "Comment" }}
+                            title="Feedback"
+                            ariaLabel="Feedback"
+                            onClick={() => onFeedbackClicked()}
+                            disabled={false}
+                        />
                     </div>
                 </Stack>
             </Stack.Item>

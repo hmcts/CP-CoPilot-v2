@@ -299,7 +299,6 @@ async def chat(request: Request):
             r = impl.run(json_body.get("history", []), json_body.get("overrides", {}), json_body.get("citation_lookup", {}), json_body.get("thought_chain", {}))
         else:
             r = impl.run(json_body.get("history", []), json_body.get("overrides", {}), {}, json_body.get("thought_chain", {}))
-       
         return StreamingResponse(r, media_type="application/x-ndjson")
 
     except Exception as ex:

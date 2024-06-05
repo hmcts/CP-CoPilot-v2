@@ -96,12 +96,12 @@ export const Layout = () => {
                                       
                                 </li>
                             }
-                            <li className={styles.headerNavLeftMargin}>
+                            {/*<li className={styles.headerNavLeftMargin}>
                                 <NavLink to="../../.auth/logout" className={({ isActive }) => (isActive ? styles.headerNavPageLinkActive : styles.headerNavPageLink)}>
                                     Sign Out
                                 </NavLink>
-                            </li>
-                    </ul>
+                            </li>*/}
+                        </ul>
                     </nav>
                     <div className={styles.headerTitleContainer}>
                         <h4 className={styles.headerTitle}>{whoAmIData?.USER_NAME}</h4>
