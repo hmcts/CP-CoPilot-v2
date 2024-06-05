@@ -11,7 +11,7 @@ import styles from "./Chat.module.css";
 import rlbgstyles from "../../components/ResponseLengthButtonGroup/ResponseLengthButtonGroup.module.css";
 import rtbgstyles from "../../components/ResponseTempButtonGroup/ResponseTempButtonGroup.module.css";
 
-import { chatApi, Approaches, ChatResponse, ChatRequest, ChatTurn, ChatMode, getFeatureFlags, GetFeatureFlagsResponse } from "../../api";
+import { chatApi, Approaches, ChatResponse, ChatRequest, ChatTurn, ChatMode, getFeatureFlags, GetFeatureFlagsResponse, GetWhoAmIResponse } from "../../api";
 import { Answer, AnswerError, AnswerLoading } from "../../components/Answer";
 import { QuestionInput } from "../../components/QuestionInput";
 import { ExampleList } from "../../components/Example";
@@ -49,6 +49,7 @@ const Chat = () => {
     const [defaultApproach, setDefaultApproach] = useState<number>(Approaches.ReadRetrieveRead);
     const [activeApproach, setActiveApproach] = useState<number>(Approaches.ReadRetrieveRead);
     const [featureFlags, setFeatureFlags] = useState<GetFeatureFlagsResponse | undefined>(undefined);
+    const [whoAmIData, setWhoAmIData] = useState<GetWhoAmIResponse | undefined>(undefined);
 
     const lastQuestionRef = useRef<string>("");
     const lastQuestionWorkCitationRef = useRef<{ [key: string]: { citation: string; source_path: string; page_number: string } }>({});
@@ -75,6 +76,29 @@ const Chat = () => {
         try {
             const fetchedFeatureFlags = await getFeatureFlags();
             setFeatureFlags(fetchedFeatureFlags);
+        } catch (error) {
+            // Handle the error here
+            console.log(error);
+        }
+    }
+    
+    async function fetchWhoAmIData() {
+        try {
+            //console.log("fetchedWhoAmIData");
+            const response = await fetch("/.auth/me", {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
+            const fetchedWhoAmIData = await response.json();
+            //console.log(fetchedWhoAmIData);
+            const user_name = fetchedWhoAmIData[0].user_claims.filter(function(el: any){return el.typ == "name"})[0].val;
+            const user_roles = fetchedWhoAmIData[0].user_claims.filter(function(el: any){return el.typ == "roles"})[0].val;
+            const user_id = fetchedWhoAmIData[0].user_claims.filter(function(el: any){return el.typ == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"})[0].val;
+
+            setWhoAmIData({USER_NAME: user_name, USER_ROLES: user_roles, USER_ID: user_id});
+
         } catch (error) {
             // Handle the error here
             console.log(error);
@@ -261,6 +285,7 @@ const Chat = () => {
     }
 
     useEffect(() => {fetchFeatureFlags()}, []);
+    useEffect(() => {fetchWhoAmIData()}, []);
     useEffect(() => chatMessageStreamEnd.current?.scrollIntoView({ behavior: "smooth" }), [isLoading]);
 
     const onRetrieveCountChange = (_ev?: React.SyntheticEvent<HTMLElement, Event>, newValue?: string) => {
@@ -342,8 +367,12 @@ const Chat = () => {
                 <ChatModeButtonGroup className="" defaultValue={activeChatMode} onClick={onChatModeChange} featureFlags={featureFlags} /> 
                 <div className={styles.commandsContainer}>
                     <ClearChatButton className={styles.commandButton} onClick={clearChat} disabled={!lastQuestionRef.current || isLoading} />
-                    <SettingsButton className={styles.commandButton} onClick={() => setIsConfigPanelOpen(!isConfigPanelOpen)} />
-                    <InfoButton className={styles.commandButton} onClick={() => setIsInfoPanelOpen(!isInfoPanelOpen)} />
+                    {whoAmIData?.USER_ROLES == "Admin" &&
+                        <SettingsButton className={styles.commandButton} onClick={() => setIsConfigPanelOpen(!isConfigPanelOpen)} />
+                    }
+                    {whoAmIData?.USER_ROLES == "Admin" &&
+                        <InfoButton className={styles.commandButton} onClick={() => setIsInfoPanelOpen(!isInfoPanelOpen)} />
+                    }
                 </div>
             </div>
             <div className={styles.chatRoot}>
@@ -373,7 +402,8 @@ const Chat = () => {
                                 </div>
                             }
                             <span className={styles.chatEmptyObjectives}>
-                                <i>Knowledge Genie AI (Artificial Intelligence) gives Common Platform Users a way of searching Common Platform knowledge stores to quickly and easily access the latest up to date Common Platform job guidance. <br />HMCTS is committed to the responsible use of AI. Our 9 principles guide the use of AI to make sure it is appropriate, safe and controlled.&nbsp;</i>
+                                <i>Knowledge Genie AI (Artificial Intelligence) gives Common Platform Users a way of searching Common Platform knowledge stores to quickly and easily access the latest up to date Common Platform job guidance. <br />
+                                HMCTS is committed to the responsible use of AI. Our 9 principles guide the use of AI to make sure it is appropriate, safe and controlled. Knowledge Genie has been assured and assessed against these Responsible AI Principles. For more details check out our &nbsp;</i>
                                 <a href="https://intranet.justice.gov.uk/documents/2024/03/hmcts-responsible-ai-approach.pdf/" target="_blank" rel="noopener noreferrer">Responsible AI Approach</a><br/><br/>
                                 {/* <a href="https://github.com/microsoft/PubSec-Info-Assistant/blob/main/docs/transparency.md" target="_blank" rel="noopener noreferrer">Transparency Note</a> */}
                             </span>
@@ -412,6 +442,7 @@ const Chat = () => {
                                             onRagCompareClicked={() => makeApiRequest(answers[index][0], Approaches.CompareWebWithWork, answer[1].work_citation_lookup, answer[1].web_citation_lookup, answer[1].thought_chain)}
                                             onRagSearchClicked={() => makeApiRequest(answers[index][0], Approaches.ReadRetrieveRead, answer[1].work_citation_lookup, answer[1].web_citation_lookup, answer[1].thought_chain)}
                                             chatMode={activeChatMode}
+                                            whoAmIData={whoAmIData}
                                         />
                                     </div>
                                 </div>
@@ -448,6 +479,7 @@ const Chat = () => {
                             showClearChat={true}
                             onClearClick={clearChat}
                             onRegenerateClick={() => makeApiRequest(lastQuestionRef.current, defaultApproach, {}, {}, {})}
+                            whoAmIData={whoAmIData}
                         />
                     </div>
                 </div>
@@ -462,6 +494,7 @@ const Chat = () => {
                         citationHeight="760px"
                         answer={answers[selectedAnswer][1]}
                         activeTab={activeAnalysisPanelTab}
+                        whoAmIData={whoAmIData}
                     />
                 )}
 

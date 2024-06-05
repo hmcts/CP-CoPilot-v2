@@ -7,7 +7,7 @@ import { ShieldCheckmark20Regular } from '@fluentui/react-icons';
 
 import styles from "./Answer.module.css";
 
-import { Approaches, ChatResponse, getCitationFilePath, ChatMode } from "../../api";
+import { Approaches, ChatResponse, getCitationFilePath, ChatMode, GetWhoAmIResponse } from "../../api";
 import { parseAnswerToHtml } from "./AnswerParser";
 import { AnswerIcon } from "./AnswerIcon";
 import { RAIPanel } from "../RAIPanel";
@@ -32,6 +32,7 @@ interface Props {
     onRegenerateClick?: () => void;
     chatMode: ChatMode;
     answerStream: ReadableStream | undefined;
+    whoAmIData: GetWhoAmIResponse | undefined; 
     setAnswer?: (data: ChatResponse) => void;
     setError?: (data: string) => void;
 }
@@ -52,6 +53,7 @@ export const Answer = ({
     onRegenerateClick,
     chatMode,
     answerStream,
+    whoAmIData,
     setAnswer,
     setError
 }: Props) => {
@@ -67,7 +69,7 @@ export const Answer = ({
                 <Stack horizontal horizontalAlign="space-between">
                     <AnswerIcon approach={answer.approach} />
                     <div>
-                        {answer.approach != Approaches.GPTDirect && 
+                        {whoAmIData?.USER_ROLES == "Admin" && answer.approach != Approaches.GPTDirect && 
                             <IconButton
                                 style={{ color: "black" }}
                                 iconProps={{ iconName: "Lightbulb" }}
@@ -77,7 +79,7 @@ export const Answer = ({
                                 disabled={!answer.thoughts}
                             />
                         }
-                        {answer.approach == Approaches.ReadRetrieveRead &&
+                        {whoAmIData?.USER_ROLES == "Admin" && answer.approach == Approaches.ReadRetrieveRead &&
                             <IconButton
                                 style={{ color: "black" }}
                                 iconProps={{ iconName: "ClipboardList" }}
@@ -226,7 +228,7 @@ export const Answer = ({
                 <div className={styles.raiwarning}>AI-generated content may be incorrect</div>
             </Stack.Item>
             {answer.answer && <Stack.Item align="center">
-                <RAIPanel approach={answer.approach} chatMode={chatMode} onAdjustClick={onAdjustClick} onRegenerateClick={onRegenerateClick} onWebSearchClicked={onWebSearchClicked} onWebCompareClicked={onWebCompareClicked} onRagCompareClicked={onRagCompareClicked} onRagSearchClicked={onRagSearchClicked} />
+                <RAIPanel approach={answer.approach} chatMode={chatMode} onAdjustClick={onAdjustClick} onRegenerateClick={onRegenerateClick} onWebSearchClicked={onWebSearchClicked} onWebCompareClicked={onWebCompareClicked} onRagCompareClicked={onRagCompareClicked} onRagSearchClicked={onRagSearchClicked} whoAmIData={whoAmIData} />
             </Stack.Item>}
         </Stack>
     );

@@ -2,7 +2,8 @@
 // Licensed under the MIT license.
 
 import { Outlet, NavLink, Link } from "react-router-dom";
-import openai from "../../assets/openai.svg";
+//import openai from "../../assets/openai.svg";
+import mojlogo from "../../assets/moj_logo_new.png";
 import { WarningBanner } from "../../components/WarningBanner/WarningBanner";
 import styles from "./Layout.module.css";
 import { Title } from "../../components/Title/Title";
@@ -58,7 +59,7 @@ export const Layout = () => {
                 <WarningBanner />
                 <div className={styles.headerContainer}>
                     <div className={styles.headerTitleContainer}>
-                        <img src={openai} alt="Azure OpenAI" className={styles.headerLogo} />
+                        <img src={mojlogo} alt="HM Courts & Tribunals Service" className={styles.headerLogo} />
                         <h3 className={styles.headerTitle}><Title /></h3>
                     </div>
                     <nav>
@@ -95,8 +96,16 @@ export const Layout = () => {
                                       
                                 </li>
                             }
+                            <li className={styles.headerNavLeftMargin}>
+                                <NavLink to="../../.auth/logout" className={({ isActive }) => (isActive ? styles.headerNavPageLinkActive : styles.headerNavPageLink)}>
+                                    Sign Out
+                                </NavLink>
+                            </li>
                     </ul>
                     </nav>
+                    <div className={styles.headerTitleContainer}>
+                        <h4 className={styles.headerTitle}>{whoAmIData?.USER_NAME}</h4>
+                    </div>
                 </div>
             </header>
 

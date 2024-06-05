@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Stack, TextField } from "@fluentui/react";
 import { Send28Filled, Broom28Filled } from "@fluentui/react-icons";
 import { RAIPanel } from "../RAIPanel";
+import { GetWhoAmIResponse } from "../../api";
 
 import styles from "./QuestionInput.module.css";
 import { Button } from "react-bootstrap";
@@ -19,9 +20,10 @@ interface Props {
     showClearChat?: boolean;
     onClearClick?: () => void;
     onRegenerateClick?: () => void;
+    whoAmIData: GetWhoAmIResponse | undefined; 
 }
 
-export const QuestionInput = ({ onSend, disabled, placeholder, clearOnSend, onAdjustClick, showClearChat, onClearClick, onRegenerateClick }: Props) => {
+export const QuestionInput = ({ onSend, disabled, placeholder, clearOnSend, onAdjustClick, showClearChat, onClearClick, onRegenerateClick, whoAmIData }: Props) => {
     const [question, setQuestion] = useState<string>("");
 
     const sendQuestion = () => {
@@ -104,7 +106,7 @@ export const QuestionInput = ({ onSend, disabled, placeholder, clearOnSend, onAd
             </Stack>
             </Stack.Item>
             <Stack.Item align="center">
-                <RAIPanel onAdjustClick={onAdjustClick} onRegenerateClick={onRegenerateClick} />
+                <RAIPanel onAdjustClick={onAdjustClick} onRegenerateClick={onRegenerateClick} whoAmIData={whoAmIData} />
             </Stack.Item>
         </Stack>
     );

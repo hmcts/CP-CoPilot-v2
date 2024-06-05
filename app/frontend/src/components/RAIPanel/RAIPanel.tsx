@@ -5,7 +5,7 @@ import { Options16Filled, ArrowSync16Filled, Briefcase16Filled, Globe16Filled, B
 
 import styles from "./RAIPanel.module.css";
 import { Icon } from "@fluentui/react";
-import { Approaches, ChatMode } from "../../api";
+import { Approaches, ChatMode, GetWhoAmIResponse } from "../../api";
 
 interface Props {
     approach?: Approaches;
@@ -16,15 +16,18 @@ interface Props {
     onRagSearchClicked?: () => void;
     onWebCompareClicked?: () => void;
     onRagCompareClicked?: () => void;
+    whoAmIData: GetWhoAmIResponse | undefined; 
 }
 
-export const RAIPanel = ({approach, chatMode, onAdjustClick, onRegenerateClick, onWebSearchClicked, onRagSearchClicked, onWebCompareClicked, onRagCompareClicked }: Props) => {
+export const RAIPanel = ({approach, chatMode, onAdjustClick, onRegenerateClick, onWebSearchClicked, onRagSearchClicked, onWebCompareClicked, onRagCompareClicked, whoAmIData }: Props) => {
     return (
         <div className={styles.adjustInputContainer}>
-            <div className={styles.adjustInput} onClick={onAdjustClick}>
-                <Options16Filled primaryFill="rgba(133, 133, 133, 1)" />
-                <span className={styles.adjustInputText}>Adjust</span>
-            </div>
+            {whoAmIData?.USER_ROLES == "Admin" && 
+                <div className={styles.adjustInput} onClick={onAdjustClick}>
+                    <Options16Filled primaryFill="rgba(133, 133, 133, 1)" />
+                    <span className={styles.adjustInputText}>Adjust</span>
+                </div>
+            }
             <div className={styles.adjustInput} onClick={onRegenerateClick}>
                 <ArrowSync16Filled primaryFill="rgba(133, 133, 133, 1)" />
                 <span className={styles.adjustInputText}>Regenerate</span>

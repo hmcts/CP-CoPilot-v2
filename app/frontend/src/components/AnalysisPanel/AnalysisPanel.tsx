@@ -12,7 +12,7 @@ import remarkGfm from 'remark-gfm'
 import styles from "./AnalysisPanel.module.css";
 
 import { SupportingContent } from "../SupportingContent";
-import { ChatResponse, ActiveCitation, getCitationObj } from "../../api";
+import { ChatResponse, ActiveCitation, getCitationObj, GetWhoAmIResponse } from "../../api";
 import { AnalysisPanelTabs } from "./AnalysisPanelTabs";
 
 interface Props {
@@ -24,11 +24,12 @@ interface Props {
     pageNumber: string | undefined;
     citationHeight: string;
     answer: ChatResponse;
+    whoAmIData: GetWhoAmIResponse | undefined;
 }
 
 const pivotItemDisabledStyle = { disabled: true, style: { color: "grey" } };
 
-export const AnalysisPanel = ({ answer, activeTab, activeCitation, sourceFile, pageNumber, citationHeight, className, onActiveTabChanged }: Props) => {
+export const AnalysisPanel = ({ answer, activeTab, activeCitation, sourceFile, pageNumber, citationHeight, className, onActiveTabChanged, whoAmIData }: Props) => {
     const [activeCitationObj, setActiveCitationObj] = useState<ActiveCitation>();
     const [markdownContent, setMarkdownContent] = useState('');
     const [plainTextContent, setPlainTextContent] = useState('');
@@ -94,20 +95,24 @@ export const AnalysisPanel = ({ answer, activeTab, activeCitation, sourceFile, p
             selectedKey={activeTab}
             onLinkClick={pivotItem => pivotItem && onActiveTabChanged(pivotItem.props.itemKey! as AnalysisPanelTabs)}
         >
-            <PivotItem
-                itemKey={AnalysisPanelTabs.ThoughtProcessTab}
-                headerText="Thought process"
-                headerButtonProps={isDisabledThoughtProcessTab ? pivotItemDisabledStyle : undefined}
-            >
+            {whoAmIData?.USER_ROLES == "Admin" &&
+                <PivotItem
+                    itemKey={AnalysisPanelTabs.ThoughtProcessTab}
+                    headerText="Thought process"
+                    headerButtonProps={isDisabledThoughtProcessTab ? pivotItemDisabledStyle : undefined}
+                >
                 <div className={styles.thoughtProcess} dangerouslySetInnerHTML={{ __html: sanitizedThoughts }}></div>
-            </PivotItem>
-            <PivotItem
-                itemKey={AnalysisPanelTabs.SupportingContentTab}
-                headerText="Supporting content"
-                headerButtonProps={isDisabledSupportingContentTab ? pivotItemDisabledStyle : undefined}
-            >
-                <SupportingContent supportingContent={answer.data_points} />
-            </PivotItem>
+                </PivotItem>
+            }
+            {whoAmIData?.USER_ROLES == "Admin" &&
+                <PivotItem
+                    itemKey={AnalysisPanelTabs.SupportingContentTab}
+                    headerText="Supporting content"
+                    headerButtonProps={isDisabledSupportingContentTab ? pivotItemDisabledStyle : undefined}
+                >
+                    <SupportingContent supportingContent={answer.data_points} />
+                </PivotItem>
+            }
             <PivotItem
                 itemKey={AnalysisPanelTabs.CitationTab}
                 headerText="Citation"
@@ -117,7 +122,7 @@ export const AnalysisPanel = ({ answer, activeTab, activeCitation, sourceFile, p
                     <PivotItem itemKey="rawFile" headerText="Document">
                         {["docx", "xlsx", "pptx"].includes(sourceFileExt) ? (
                             // Treat other Office formats like "xlsx" for the Office Online Viewer
-                            <iframe title="Source File" src={'https://view.officeapps.live.com/op/view.aspx?src=' + encodeURIComponent(sourceFile as string) + "&action=embedview&wdStartOn=" + pageNumber} width="100%" height={citationHeight} />
+                            <iframe title="Source File" src={'https://view.officeapps.live.com/op/embed.aspx?src=' + encodeURIComponent(sourceFile as string) + "&action=embedview&wdStartOn=" + pageNumber} width="100%" height={citationHeight} />
                         ) : sourceFileExt === "pdf" ? (
                             // Use object tag for PDFs because iframe does not support page numbers
                             <object data={sourceFile + "#page=" + pageNumber} type="application/pdf" width="100%" height={citationHeight} />
@@ -132,23 +137,25 @@ export const AnalysisPanel = ({ answer, activeTab, activeCitation, sourceFile, p
                             <iframe title="Source File" src={sourceFile} width="100%" height={citationHeight} />
                         )}
                     </PivotItem>
-                    <PivotItem itemKey="indexedFile" headerText="Document Section">
-                        {activeCitationObj === undefined ? (
-                            <Text>Loading...</Text>
-                        ) : (
-                            <div>
-                                <Separator>Metadata</Separator>
-                                <Label>File Name</Label><Text>{activeCitationObj.file_name}</Text>
-                                <Label>File URI</Label><Text>{activeCitationObj.file_uri}</Text>
-                                <Label>Title</Label><Text>{activeCitationObj.title}</Text>
-                                <Label>Section</Label><Text>{activeCitationObj.section}</Text>
-                                <Label>Page Number(s)</Label><Text>{activeCitationObj.pages?.join(",")}</Text>
-                                <Label>Token Count</Label><Text>{activeCitationObj.token_count}</Text>
-                                <Separator>Content</Separator>
-                                <Label>Content</Label><Text>{activeCitationObj.content}</Text>
-                            </div>
-                        )}
-                    </PivotItem>
+                    {whoAmIData?.USER_ROLES == "Admin" &&
+                        <PivotItem itemKey="indexedFile" headerText="Document Section">
+                            {activeCitationObj === undefined ? (
+                                <Text>Loading...</Text>
+                            ) : (
+                                <div>
+                                    <Separator>Metadata</Separator>
+                                    <Label>File Name</Label><Text>{activeCitationObj.file_name}</Text>
+                                    <Label>File URI</Label><Text>{activeCitationObj.file_uri}</Text>
+                                    <Label>Title</Label><Text>{activeCitationObj.title}</Text>
+                                    <Label>Section</Label><Text>{activeCitationObj.section}</Text>
+                                    <Label>Page Number(s)</Label><Text>{activeCitationObj.pages?.join(",")}</Text>
+                                    <Label>Token Count</Label><Text>{activeCitationObj.token_count}</Text>
+                                    <Separator>Content</Separator>
+                                    <Label>Content</Label><Text>{activeCitationObj.content}</Text>
+                                </div>
+                            )}
+                        </PivotItem>
+                    }
                 </Pivot>
             </PivotItem>
         </Pivot>
