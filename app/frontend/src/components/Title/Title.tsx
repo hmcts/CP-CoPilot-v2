@@ -8,7 +8,7 @@ export const Title = () => {
     const [Title, setTitle] = useState<ApplicationTitle | null>(null);
 
     async function fetchApplicationTitle() {
-        console.log("fetch Application Title");
+        //console.log("fetch Application Title");
         try {
 
 

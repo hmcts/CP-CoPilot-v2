@@ -399,7 +399,6 @@ export async function getInfoData(): Promise<GetInfoResponse> {
         console.log(response);
         throw Error(parsedResponse.error || "Unknown error");
     }
-    console.log(parsedResponse);
     return parsedResponse;
 }
 
@@ -415,7 +414,6 @@ export async function getWarningBanner(): Promise<GetWarningBanner> {
         console.log(response);
         throw Error(parsedResponse.error || "Unknown error");
     }
-    console.log(parsedResponse);
     return parsedResponse;
 }
 
@@ -431,7 +429,6 @@ export async function getMaxCSVFileSize(): Promise<getMaxCSVFileSizeType> {
         console.log(response);
         throw Error(parsedResponse.error || "Unknown error");
     }
-    console.log(parsedResponse);
     return parsedResponse;
 }
 
@@ -454,7 +451,6 @@ export async function getCitationObj(citation: string): Promise<ActiveCitation> 
 }
 
 export async function getApplicationTitle(): Promise<ApplicationTitle> {
-    console.log("fetch Application Titless");
     const response = await fetch("/getApplicationTitle", {
         method: "GET",
         headers: {
@@ -467,7 +463,6 @@ export async function getApplicationTitle(): Promise<ApplicationTitle> {
         console.log(response);
         throw Error(parsedResponse.error || "Unknown error");
     }
-    console.log(parsedResponse);
     return parsedResponse;
 }
 
@@ -500,6 +495,5 @@ export async function getFeatureFlags(): Promise<GetFeatureFlagsResponse> {
         console.log(response);
         throw Error(parsedResponse.error || "Unknown error");
     }
-    console.log(parsedResponse);
     return parsedResponse;
 }

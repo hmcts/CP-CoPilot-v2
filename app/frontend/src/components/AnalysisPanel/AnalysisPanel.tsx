@@ -45,7 +45,7 @@ export const AnalysisPanel = ({ answer, activeTab, activeCitation, sourceFile, p
         try {
             const citationObj = await getCitationObj(activeCitation as string);
             setActiveCitationObj(citationObj);
-            console.log(citationObj);
+            //console.log(citationObj);
         } catch (error) {
             // Handle the error here
             console.log(error);

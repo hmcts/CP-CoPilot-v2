@@ -447,6 +447,7 @@ const Chat = () => {
                                             chatMode={activeChatMode}
                                             whoAmIData={whoAmIData}
                                             onFeedbackClicked={() => setIsFeedbackPanelOpen(!isFeedbackPanelOpen)}
+                                            question={answer[0]}
                                         />
                                     </div>
                                 </div>

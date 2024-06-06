@@ -17,7 +17,7 @@ export const WarningBanner = ({ className }: Props) => {
     const [infoData, setWarningBanner] = useState<GetWarningBanner | null>(null);
 
     async function fetchWarningBanner() {
-        console.log("Warning Banner 1");
+        //console.log("Warning Banner 1");
         try {
             const fetchedWarningBannerInfo = await getWarningBanner();
             if (!fetchedWarningBannerInfo.WARNING_BANNER_TEXT){

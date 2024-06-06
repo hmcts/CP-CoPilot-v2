@@ -2,7 +2,7 @@
 // Licensed under the MIT license.
 
 import { renderToStaticMarkup } from "react-dom/server";
-import { getCitationFilePath, Approaches } from "../../api";
+import { getCitationFilePath, Approaches, GetWhoAmIResponse } from "../../api";
 
 import styles from "./Answer.module.css";
 
@@ -15,6 +15,8 @@ type HtmlParsedAnswer = {
     pageNumbers: Record<string, number>;
     followupQuestions: string[];
     approach: Approaches;
+    question: string;
+    whoAmIData: GetWhoAmIResponse | undefined;
 };
 
 type ThoughtChain = Record<string, string>;
@@ -25,7 +27,7 @@ type CitationLookup = Record<string, {
     page_number: string;
 }>;
 
-export function parseAnswerToHtml(answer: string, approach: Approaches, work_citation_lookup: CitationLookup, web_citation_lookup: CitationLookup, thought_chain: ThoughtChain, onCitationClicked: (citationFilePath: string, citationSourcePath: string, pageNumber: string) => void): HtmlParsedAnswer {
+export function parseAnswerToHtml(answer: string, approach: Approaches, work_citation_lookup: CitationLookup, web_citation_lookup: CitationLookup, thought_chain: ThoughtChain, onCitationClicked: (citationFilePath: string, citationSourcePath: string, pageNumber: string) => void, question: string, whoAmIData: GetWhoAmIResponse | undefined): HtmlParsedAnswer {
     const work_citations: string[] = [];
     const web_citations: string[] = [];
     const work_sourceFiles: Record<string, string> = {};
@@ -41,6 +43,12 @@ export function parseAnswerToHtml(answer: string, approach: Approaches, work_cit
 
     // trim any whitespace from the end of the answer after removing follow-up questions
     parsedAnswer = parsedAnswer.trim();
+    if(parsedAnswer != "") {
+        console.log(question);
+        console.log(whoAmIData?.USER_ID);
+        console.log(parsedAnswer);
+        console.log(work_citations);
+    }
     var fragments: string[] = [];
     var work_fragments: string[] = [];
     var web_fragments: string[] = [];
@@ -229,6 +237,8 @@ export function parseAnswerToHtml(answer: string, approach: Approaches, work_cit
         web_sourceFiles,
         pageNumbers,
         followupQuestions,
-        approach
+        approach,
+        question,
+        whoAmIData
     };
 }

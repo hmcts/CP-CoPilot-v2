@@ -134,10 +134,12 @@ const CharacterStreamer = ({ eventSource, nonEventString, onStreamingComplete, c
   const processQueue = () => {
     setIsLoading(false);
     processingRef.current = true;
+    var lastoutput = output;
     const intervalId = setInterval(() => {
       if (queueRef.current.length > 0) {
         const char = queueRef.current.shift();
         setOutput((prevOutput) => prevOutput + char);
+        lastoutput = output;
       } else {
         clearInterval(intervalId);
         processingRef.current = false;

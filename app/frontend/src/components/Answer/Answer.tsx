@@ -36,6 +36,7 @@ interface Props {
     setAnswer?: (data: ChatResponse) => void;
     setError?: (data: string) => void;
     onFeedbackClicked: () => void;
+    question: string
 }
 
 export const Answer = ({
@@ -57,9 +58,10 @@ export const Answer = ({
     whoAmIData,
     setAnswer,
     setError,
-    onFeedbackClicked
+    onFeedbackClicked,
+    question
 }: Props) => {
-    const parsedAnswer = useMemo(() => parseAnswerToHtml(answer.answer, answer.approach, answer.work_citation_lookup, answer.web_citation_lookup, answer.thought_chain, onCitationClicked), [answer]);
+    const parsedAnswer = useMemo(() => parseAnswerToHtml(answer.answer, answer.approach, answer.work_citation_lookup, answer.web_citation_lookup, answer.thought_chain, onCitationClicked, question, whoAmIData), [answer]);
 
     return (
         <Stack className={`${answer.approach == Approaches.ReadRetrieveRead ? styles.answerContainerWork : 
