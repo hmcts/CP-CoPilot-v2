@@ -11,7 +11,7 @@ import styles from "./Chat.module.css";
 import rlbgstyles from "../../components/ResponseLengthButtonGroup/ResponseLengthButtonGroup.module.css";
 import rtbgstyles from "../../components/ResponseTempButtonGroup/ResponseTempButtonGroup.module.css";
 
-import { chatApi, Approaches, ChatResponse, ChatRequest, ChatTurn, ChatMode, getFeatureFlags, GetFeatureFlagsResponse, GetWhoAmIResponse } from "../../api";
+import { chatApi, Approaches, ChatResponse, ChatRequest, ChatTurn, ChatMode, getFeatureFlags, GetFeatureFlagsResponse, GetWhoAmIResponse, UserChatInteraction } from "../../api";
 import { Answer, AnswerError, AnswerLoading } from "../../components/Answer";
 import { QuestionInput } from "../../components/QuestionInput";
 import { ExampleList } from "../../components/Example";
@@ -52,6 +52,7 @@ const Chat = () => {
     const [activeApproach, setActiveApproach] = useState<number>(Approaches.ReadRetrieveRead);
     const [featureFlags, setFeatureFlags] = useState<GetFeatureFlagsResponse | undefined>(undefined);
     const [whoAmIData, setWhoAmIData] = useState<GetWhoAmIResponse | undefined>(undefined);
+    const [userChatData, setUserChatInteraction] = useState<UserChatInteraction>();
 
     const lastQuestionRef = useRef<string>("");
     const lastQuestionWorkCitationRef = useRef<{ [key: string]: { citation: string; source_path: string; page_number: string } }>({});
@@ -107,10 +108,20 @@ const Chat = () => {
         }
     }
 
+    async function logUserChatData(chatData: UserChatInteraction | undefined) {
+        try {
+            console.log(chatData);
+        } catch (error) {
+            // Handle the error here
+            console.log(error);
+        }
+    }
+
     const makeApiRequest = async (question: string, approach: Approaches, 
                                 work_citation_lookup: { [key: string]: { citation: string; source_path: string; page_number: string } },
                                 web_citation_lookup: { [key: string]: { citation: string; source_path: string; page_number: string } },
                                 thought_chain: { [key: string]: string}) => {
+        const start_timestamp = new Date().toUTCString();                            
         lastQuestionRef.current = question;
         lastQuestionWorkCitationRef.current = work_citation_lookup;
         lastQuestionWebCitiationRef.current = web_citation_lookup;
@@ -170,6 +181,9 @@ const Chat = () => {
             }
 
             setAnswerStream(result.body);
+            const end_timestamp = new Date().toUTCString();
+            const userChatInteraction: UserChatInteraction = ({USER_ID: whoAmIData?.USER_ID, PROMPT: question, START_TIMESTAMP: start_timestamp, END_TIMESTAMP: end_timestamp, RESPONSE: temp.answer, CITATIONS: []})
+            setUserChatInteraction(userChatInteraction);
         } catch (e) {
             setError(e);
         } finally {
@@ -447,7 +461,8 @@ const Chat = () => {
                                             chatMode={activeChatMode}
                                             whoAmIData={whoAmIData}
                                             onFeedbackClicked={() => setIsFeedbackPanelOpen(!isFeedbackPanelOpen)}
-                                            question={answer[0]}
+                                            userChatInteraction={userChatData}
+                                            onUserChatInteraction={(chatData) => logUserChatData(chatData)}
                                         />
                                     </div>
                                 </div>

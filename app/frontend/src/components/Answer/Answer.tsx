@@ -7,7 +7,7 @@ import { ShieldCheckmark20Regular } from '@fluentui/react-icons';
 
 import styles from "./Answer.module.css";
 
-import { Approaches, ChatResponse, getCitationFilePath, ChatMode, GetWhoAmIResponse } from "../../api";
+import { Approaches, ChatResponse, getCitationFilePath, ChatMode, GetWhoAmIResponse, UserChatInteraction } from "../../api";
 import { parseAnswerToHtml } from "./AnswerParser";
 import { AnswerIcon } from "./AnswerIcon";
 import { RAIPanel } from "../RAIPanel";
@@ -36,7 +36,8 @@ interface Props {
     setAnswer?: (data: ChatResponse) => void;
     setError?: (data: string) => void;
     onFeedbackClicked: () => void;
-    question: string
+    userChatInteraction: UserChatInteraction | undefined
+    onUserChatInteraction: (userChatData : UserChatInteraction | undefined) => void;
 }
 
 export const Answer = ({
@@ -59,9 +60,10 @@ export const Answer = ({
     setAnswer,
     setError,
     onFeedbackClicked,
-    question
+    userChatInteraction,
+    onUserChatInteraction
 }: Props) => {
-    const parsedAnswer = useMemo(() => parseAnswerToHtml(answer.answer, answer.approach, answer.work_citation_lookup, answer.web_citation_lookup, answer.thought_chain, onCitationClicked, question, whoAmIData), [answer]);
+    const parsedAnswer = useMemo(() => parseAnswerToHtml(answer.answer, answer.approach, answer.work_citation_lookup, answer.web_citation_lookup, answer.thought_chain, onCitationClicked, userChatInteraction, whoAmIData, onUserChatInteraction), [answer]);
 
     return (
         <Stack className={`${answer.approach == Approaches.ReadRetrieveRead ? styles.answerContainerWork : 
