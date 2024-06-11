@@ -17,6 +17,8 @@ import { ChatResponse,
     ResubmitItemRequest,
     GetFeatureFlagsResponse,
     getMaxCSVFileSizeType,
+    UserChatInteraction,
+    UserFeedback,
     } from "./models";
 
 export async function chatApi(options: ChatRequest, signal: AbortSignal): Promise<Response> {
@@ -496,4 +498,58 @@ export async function getFeatureFlags(): Promise<GetFeatureFlagsResponse> {
         throw Error(parsedResponse.error || "Unknown error");
     }
     return parsedResponse;
+}
+
+export async function logUserChatInteraction(user_chat_data: UserChatInteraction | undefined): Promise<StatusLogResponse> {
+    var citations = JSON.stringify(user_chat_data?.CITATIONS);
+    console.log(citations);
+    var response = await fetch("/logUserChatInteraction", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            "user": user_chat_data?.USER_ID,
+            "prompt": user_chat_data?.PROMPT,
+            "start_time": user_chat_data?.START_TIMESTAMP,
+            "response": user_chat_data?.RESPONSE,
+            "end_time": user_chat_data?.END_TIMESTAMP,
+            "citations": citations
+            })
+    });
+
+    var parsedResponse: StatusLogResponse = await response.json();
+    if (response.status > 299 || !response.ok) {
+        throw Error(parsedResponse.error || "Unknown error");
+    }
+
+    var results: StatusLogResponse = {status: parsedResponse.status};
+    return results;
+}
+
+export async function logUserFeedback(user_feedback_data: UserFeedback | undefined): Promise<StatusLogResponse> {
+    console.log(user_feedback_data);
+    var response = await fetch("/logUserFeedback", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            "user": user_feedback_data?.USER_ID,
+            "accuracy": user_feedback_data?.ACCURACY,
+            "ease_of_use": user_feedback_data?.EASE_OF_USE,
+            "response_time": user_feedback_data?.RESPONSE_TIME,
+            "helpful": user_feedback_data?.HELPFUL,
+            "reusability": user_feedback_data?.REUSABILITY,
+            "timestamp": user_feedback_data?.TIMESTAMP
+        })
+    });
+
+    var parsedResponse: StatusLogResponse = await response.json();
+    if (response.status > 299 || !response.ok) {
+        throw Error(parsedResponse.error || "Unknown error");
+    }
+
+    var results: StatusLogResponse = {status: parsedResponse.status};
+    return results;
 }

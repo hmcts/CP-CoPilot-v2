@@ -235,3 +235,14 @@ export type UserChatInteraction = {
     END_TIMESTAMP: string;
     error?: string;
 };
+
+export type UserFeedback = {
+    USER_ID?: string;
+    ACCURACY?: string;
+    EASE_OF_USE?: string;
+    RESPONSE_TIME?: string;
+    HELPFUL?: string;
+    REUSABILITY?: string;
+    TIMESTAMP: string;
+    error?: string;
+};

@@ -48,6 +48,8 @@ from approaches.tabulardataassistant import (
 
 )
 from shared_code.status_log import State, StatusClassification, StatusLog, StatusQueryLevel
+from shared_code.user_chat_log import UserChatLog
+from shared_code.user_feedback_log import UserFeedbackLog
 from azure.cosmos import CosmosClient
 
 
@@ -88,6 +90,9 @@ ENV = {
     "COSMOSDB_KEY": None,
     "COSMOSDB_LOG_DATABASE_NAME": "statusdb",
     "COSMOSDB_LOG_CONTAINER_NAME": "statuscontainer",
+    "COSMOSDB_USAGE_DATABASE_NAME": "usagedb",
+    "COSMOSDB_USERCHAT_CONTAINER_NAME": "userchatcontainer",
+    "COSMOSDB_USERFEEDBACK_CONTAINER_NAME": "userfeedbackcontainer",
     "QUERY_TERM_LANGUAGE": "English",
     "TARGET_EMBEDDINGS_MODEL": "BAAI/bge-small-en-v1.5",
     "ENRICHMENT_APPSERVICE_URL": "enrichment",
@@ -144,6 +149,22 @@ statusLog = StatusLog(
     ENV["COSMOSDB_KEY"],
     ENV["COSMOSDB_LOG_DATABASE_NAME"],
     ENV["COSMOSDB_LOG_CONTAINER_NAME"]
+)
+
+# Setup UserChatLog to allow access to CosmosDB for logging
+userChatLog = UserChatLog(
+    ENV["COSMOSDB_URL"],
+    ENV["COSMOSDB_KEY"],
+    ENV["COSMOSDB_USAGE_DATABASE_NAME"],
+    ENV["COSMOSDB_USERCHAT_CONTAINER_NAME"]
+)
+
+# Setup UserChatLog to allow access to CosmosDB for logging
+userFeedbackLog = UserFeedbackLog(
+    ENV["COSMOSDB_URL"],
+    ENV["COSMOSDB_KEY"],
+    ENV["COSMOSDB_USAGE_DATABASE_NAME"],
+    ENV["COSMOSDB_USERFEEDBACK_CONTAINER_NAME"]
 )
 
 azure_search_key_credential = AzureKeyCredential(ENV["AZURE_SEARCH_SERVICE_KEY"])
@@ -847,6 +868,65 @@ async def get_feature_flags():
         "ENABLE_MULTIMEDIA": str_to_bool.get(ENV["ENABLE_MULTIMEDIA"]),
     }
     return response
+
+@app.post("/logUserChatInteraction")
+async def logUserChatInteraction(request: Request):
+    """
+    Log the user chat interaction to CosmosDB.
+
+    Parameters:
+    - request: Request object containing the HTTP request data.
+
+    Returns:
+    - A dictionary with the status code 200 if successful, or an error
+        message with status code 500 if an exception occurs.
+    """
+
+    try:
+        json_body = await request.json()
+        user = json_body.get("user")
+        prompt = json_body.get("prompt")
+        start_time = json_body.get("start_time")
+        response = json_body.get("response")
+        end_time = json_body.get("end_time")
+        citations = json_body.get("citations")
+
+        userChatLog.upsert_document(user, prompt, start_time, response, citations, end_time)
+
+    except Exception as ex:
+        log.exception("Exception in /logstatus")
+        raise HTTPException(status_code=500, detail=str(ex)) from ex
+    raise HTTPException(status_code=200, detail="Success")
+
+@app.post("/logUserFeedback")
+async def logUserFeedback(request: Request):
+    """
+    Log the user feedback to CosmosDB.
+
+    Parameters:
+    - request: Request object containing the HTTP request data.
+
+    Returns:
+    - A dictionary with the status code 200 if successful, or an error
+        message with status code 500 if an exception occurs.
+    """
+
+    try:
+        json_body = await request.json()
+        user = json_body.get("user")
+        accuracy = json_body.get("accuracy")
+        ease_of_use = json_body.get("ease_of_use")
+        response_time = json_body.get("response_time")
+        helpful = json_body.get("helpful")
+        reusability = json_body.get("reusability")
+        timestamp = json_body.get("timestamp")
+
+        userFeedbackLog.upsert_document(user, accuracy, ease_of_use, response_time, helpful, reusability, timestamp)
+
+    except Exception as ex:
+        log.exception("Exception in /logstatus")
+        raise HTTPException(status_code=500, detail=str(ex)) from ex
+    raise HTTPException(status_code=200, detail="Success")
 
 app.mount("/", StaticFiles(directory="static"), name="static")
 

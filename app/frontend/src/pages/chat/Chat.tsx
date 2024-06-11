@@ -11,7 +11,7 @@ import styles from "./Chat.module.css";
 import rlbgstyles from "../../components/ResponseLengthButtonGroup/ResponseLengthButtonGroup.module.css";
 import rtbgstyles from "../../components/ResponseTempButtonGroup/ResponseTempButtonGroup.module.css";
 
-import { chatApi, Approaches, ChatResponse, ChatRequest, ChatTurn, ChatMode, getFeatureFlags, GetFeatureFlagsResponse, GetWhoAmIResponse, UserChatInteraction } from "../../api";
+import { chatApi, Approaches, ChatResponse, ChatRequest, ChatTurn, ChatMode, getFeatureFlags, GetFeatureFlagsResponse, GetWhoAmIResponse, UserChatInteraction, logUserChatInteraction, UserFeedback, logUserFeedback } from "../../api";
 import { Answer, AnswerError, AnswerLoading } from "../../components/Answer";
 import { QuestionInput } from "../../components/QuestionInput";
 import { ExampleList } from "../../components/Example";
@@ -110,18 +110,29 @@ const Chat = () => {
 
     async function logUserChatData(chatData: UserChatInteraction | undefined) {
         try {
-            console.log(chatData);
+            await logUserChatInteraction(chatData);
         } catch (error) {
             // Handle the error here
             console.log(error);
         }
+        setIsFeedbackPanelOpen(true);
+    }
+
+    async function logFeedbackData(feedbackData: UserFeedback | undefined) {
+        try {
+            await logUserFeedback(feedbackData);
+        } catch (error) {
+            // Handle the error here
+            console.log(error);
+        }
+        setIsFeedbackPanelOpen(false);
     }
 
     const makeApiRequest = async (question: string, approach: Approaches, 
                                 work_citation_lookup: { [key: string]: { citation: string; source_path: string; page_number: string } },
                                 web_citation_lookup: { [key: string]: { citation: string; source_path: string; page_number: string } },
                                 thought_chain: { [key: string]: string}) => {
-        const start_timestamp = new Date().toUTCString();                            
+        const start_timestamp = new Date().toISOString();
         lastQuestionRef.current = question;
         lastQuestionWorkCitationRef.current = work_citation_lookup;
         lastQuestionWebCitiationRef.current = web_citation_lookup;
@@ -181,7 +192,7 @@ const Chat = () => {
             }
 
             setAnswerStream(result.body);
-            const end_timestamp = new Date().toUTCString();
+            const end_timestamp = new Date().toISOString();
             const userChatInteraction: UserChatInteraction = ({USER_ID: whoAmIData?.USER_ID, PROMPT: question, START_TIMESTAMP: start_timestamp, END_TIMESTAMP: end_timestamp, RESPONSE: temp.answer, CITATIONS: []})
             setUserChatInteraction(userChatInteraction);
         } catch (e) {
@@ -584,13 +595,16 @@ const Chat = () => {
                 <Panel
                     headerText="Feedback"
                     isOpen={isFeedbackPanelOpen}
-                    isBlocking={true}
+                    isBlocking={false}
                     onDismiss={() => setIsFeedbackPanelOpen(false)}
                     closeButtonAriaLabel="Close"
                     onRenderFooterContent={() => <DefaultButton onClick={() => setIsFeedbackPanelOpen(false)}>Close</DefaultButton>}
                     isFooterAtBottom={true}                >
                     <div className={styles.resultspanel}>
-                        <FeedbackContent />
+                        <FeedbackContent 
+                            onUserFeedback={(feedbackData) => logFeedbackData(feedbackData)}
+                            whoAmIData={whoAmIData} 
+                        />
                     </div>
                 </Panel>
             </div>

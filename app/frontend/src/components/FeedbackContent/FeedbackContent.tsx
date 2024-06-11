@@ -5,9 +5,11 @@ import React, { useEffect, useState } from "react";
 import { Text } from "@fluentui/react";
 import { Label } from '@fluentui/react/lib/Label';
 import { Separator } from '@fluentui/react/lib/Separator';
-import { getInfoData, GetInfoResponse  } from "../../api";
+import { getInfoData, GetInfoResponse, UserFeedback, GetWhoAmIResponse  } from "../../api";
 import appVersionInfo from '../../../version.json';
 import { Dropdown, DropdownMenuItemType, IDropdownOption, IDropdownStyles } from '@fluentui/react/lib/Dropdown';
+import classNames from "classnames";
+import styles from "./FeedbackContent.module.css";
 
 const dropdownStyles: Partial<IDropdownStyles> = { dropdown: { width: 200 } };
 
@@ -58,9 +60,11 @@ const dropdownReusabilityOptions = [
 
 interface Props {
     className?: string;
+    whoAmIData: GetWhoAmIResponse | undefined;
+    onUserFeedback: (feedbackData : UserFeedback | undefined) => void;
 }
 
-export const FeedbackContent = ({ className }: Props) => {
+export const FeedbackContent = ({ className, whoAmIData, onUserFeedback }: Props) => {
     const [selectedAccuracyItem, setSelectedAccuracyItem] = useState<IDropdownOption>();
     const [selectedEaseOfuseItem, setSelectedEaseOfuseItem] = useState<IDropdownOption>();
     const [selectedResponseTimeItem, setSelectedResponseTimeItem] = useState<IDropdownOption>();
@@ -90,6 +94,20 @@ export const FeedbackContent = ({ className }: Props) => {
     useEffect(() => {
         //fetchInfoData();
     }, []);
+
+    // execute the feedback button
+    const handleFeedback = (async () => {
+      const userFeedbackData: UserFeedback = ({
+        USER_ID: whoAmIData?.USER_ID, 
+        ACCURACY: selectedAccuracyItem?.text, 
+        EASE_OF_USE: selectedEaseOfuseItem?.text, 
+        RESPONSE_TIME: selectedResponseTimeItem?.text, 
+        HELPFUL: selectedHelpfulItem?.text,
+        REUSABILITY: selectedReusabilityItem?.text,
+        TIMESTAMP: new Date().toISOString()
+      })
+      onUserFeedback(userFeedbackData);
+    });
 
     return (
         <div>
@@ -138,6 +156,16 @@ export const FeedbackContent = ({ className }: Props) => {
                 styles={dropdownStyles}
                 aria-label="Reusability Options"
             />
+        <button
+          onClick={handleFeedback}
+          className={classNames(
+            styles.upload_button,
+            ""
+          )}
+          aria-label="Submit Feedback"
+        >
+          Submit Feedback
+        </button>            
         </div>
     );
 };
