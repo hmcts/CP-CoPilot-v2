@@ -2,10 +2,20 @@
 # Licensed under the MIT license.
 
 """ Library of code for status logs reused across various calling features """
+from enum import Enum
 import os
+from datetime import datetime, timedelta
 import logging
 from azure.cosmos import CosmosClient, PartitionKey, exceptions
 import traceback, sys
+
+class State(Enum):
+    """ Enum for state of a chat """
+    UNEVALUATED = "Unevaluated"
+    CORRECT = "Correct"
+    INCORRECT = "Incorrect"
+    PARTIAL = "Partial"
+    ALL = "All"
 
 class UserChatLog:
     """ Class for logging User Chats to Cosmos DB"""
@@ -45,7 +55,9 @@ class UserChatLog:
                 "start_time": start_time,
                 "response": response,
                 "citations": citations,
-                "end_time": end_time
+                "end_time": end_time,
+                "state": str(State.UNEVALUATED.value),
+                "review_comment": ""
             }
             self.container.upsert_item(body=json_document)
 
@@ -53,3 +65,33 @@ class UserChatLog:
             # log the exception with stack trace to the status log
             logging.error("Unexpected exception upserting document %s", str(err))
 
+    def read_chat_interactions_by_timeframe(self,
+                       within_n_hours: int,
+                       ):
+        """ 
+        Function to issue a query and return resulting chat interactions          
+        args
+            within_n_hours - integer representing from how many minutes ago to return docs for
+        """
+
+        query_string = "SELECT c.id,  c.user, c.prompt, \
+            c.response, c.start_time, c.end_time, c.citations, \
+            c.state, c.review_comment FROM c"
+
+        conditions = []    
+        if within_n_hours != -1:
+            from_time = datetime.utcnow() - timedelta(hours=within_n_hours)
+            from_time_string = str(from_time.strftime('%Y-%m-%d %H:%M:%S'))
+            conditions.append(f"c.start_time > '{from_time_string}'")
+
+        if conditions:
+            query_string += " WHERE " + " AND ".join(conditions)
+
+        query_string += " ORDER BY c.start_time DESC"
+
+        items = list(self.container.query_items(
+            query=query_string,
+            enable_cross_partition_query=True
+        ))
+
+        return items

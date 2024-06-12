@@ -226,6 +226,14 @@ export type GetWhoAmIResponse = {
     error?: string;
 };
 
+export const enum AccuracyState {
+    UNEVALUATED = "Unevaluated",
+    CORRECT = "Correct",
+    INCORRECT = "Incorrect",
+    PARTIAL = "Partial",
+    ALL = "All"
+}
+
 export type UserChatInteraction = {
     USER_ID?: string;
     PROMPT: string;
@@ -233,6 +241,8 @@ export type UserChatInteraction = {
     CITATIONS: string[];
     START_TIMESTAMP: string;
     END_TIMESTAMP: string;
+    STATE?: AccuracyState;
+    REVIEW_COMMENT?: string;
     error?: string;
 };
 

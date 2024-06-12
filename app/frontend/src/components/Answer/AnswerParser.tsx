@@ -150,8 +150,8 @@ export function parseAnswerToHtml(answer: string, approach: Approaches, work_cit
         });
         if(parsedAnswer != "") {
             const chatData: UserChatInteraction | undefined = userChatInteraction;
-            //chatData!.RESPONSE = parsedAnswer;
-            chatData!.RESPONSE = fragments.join("")
+            chatData!.RESPONSE = parsedAnswer;
+            //chatData!.RESPONSE = fragments.join("")
             chatData!.CITATIONS = work_citations;
             onUserChatInteraction(chatData);
         }

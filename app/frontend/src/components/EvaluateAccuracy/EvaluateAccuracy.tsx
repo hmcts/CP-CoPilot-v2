@@ -5,9 +5,9 @@ import { useState, useEffect, useRef } from "react";
 import { Dropdown, DropdownMenuItemType, IDropdownOption, IDropdownStyles } from '@fluentui/react/lib/Dropdown';
 import { DefaultButton, DetailsList, DetailsListLayoutMode, Dialog, DialogFooter, DialogType, IColumn, Panel, PanelType, PrimaryButton, SelectionMode, Stack, TooltipHost } from "@fluentui/react";
 import { animated, useSpring } from "@react-spring/web";
-import { getAllUploadStatus, FileUploadBasicStatus, GetUploadStatusRequest, FileState, UserFeedback, getAllUserFeedback } from "../../api";
+import { getAllUploadStatus, FileUploadBasicStatus, GetUploadStatusRequest, FileState, UserFeedback, getAllUserChatInteractions, UserChatInteraction } from "../../api";
 
-import styles from "./EvaluateFeedback.module.css";
+import styles from "./EvaluateAccuracy.module.css";
 import { ArrowClockwise24Regular, DocumentFolderFilled, ImageBorderFilled } from "@fluentui/react-icons";
 //import { IDocument } from "../FileStatus/DocumentsDetailList";
 import { StatusContent } from "../StatusContent/StatusContent";
@@ -28,10 +28,10 @@ interface Props {
     className?: string;
 }
 
-export const EvaluateFeedback = ({ className }: Props) => {
+export const EvaluateAccuracy = ({ className }: Props) => {
     const [selectedTimeFrameItem, setSelectedTimeFrameItem] = useState<IDropdownOption>();
 
-    const [files, setFiles] = useState<UserFeedback[]>();
+    const [files, setFiles] = useState<UserChatInteraction[]>();
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const onTimeSpanChange = (event: React.FormEvent<HTMLDivElement>, item: IDropdownOption<any> | undefined): void => {
@@ -115,7 +115,7 @@ export const EvaluateFeedback = ({ className }: Props) => {
         const req = {
             timeframe: timeframe
         }
-        const response = await getAllUserFeedback(req);
+        const response = await getAllUserChatInteractions(req);
         setIsLoading(false);
         setFiles(response);
     }
@@ -178,69 +178,49 @@ export const EvaluateFeedback = ({ className }: Props) => {
             isPadded: true,
         },
         {
-            key: 'accuracy',
-            name: 'Accuracy',
-            fieldName: 'accuracy',
-            minWidth: 90,
-            maxWidth: 120,
+            key: 'prompt',
+            name: 'Prompt',
+            fieldName: 'prompt',
+            minWidth: 150,
+            maxWidth: 180,
             isResizable: true,
             ariaLabel: 'Accuracy',
             onColumnClick: onColumnClick,
             data: 'string',
         },
         {
-            key: 'ease_of_use',
-            name: 'Ease of Use',
-            fieldName: 'ease_of_use',
-            minWidth: 90,
-            maxWidth: 120,
+            key: 'response',
+            name: 'Response',
+            fieldName: 'response',
+            minWidth: 210,
+            maxWidth: 350,
             isResizable: true,
-            ariaLabel: 'Ease of Use',
+            ariaLabel: 'Response',
             onColumnClick: onColumnClick,
             data: 'string',
         },
         {
-            key: 'response_time',
-            name: 'Response Time',
-            fieldName: 'response_time',
-            minWidth: 90,
-            maxWidth: 120,
-            isResizable: true,
-            ariaLabel: 'Response Time',
-            onColumnClick: onColumnClick,
-            data: 'string',
-        },
-        {
-            key: 'helpful',
-            name: 'Helpful',
-            fieldName: 'helpful',
-            minWidth: 90,
-            maxWidth: 120,
-            isResizable: true,
-            ariaLabel: 'Helpful',
-            onColumnClick: onColumnClick,
-            data: 'string',
-        },
-        {
-            key: 'reusability',
-            name: 'Reusability',
-            fieldName: 'reusability',
-            minWidth: 90,
-            maxWidth: 120,
-            isResizable: true,
-            ariaLabel: 'Reusability',
-            onColumnClick: onColumnClick,
-            data: 'string',
-        },
-        {
-            key: 'timestamp',
-            name: 'Submitted On',
-            fieldName: 'timestamp',
+            key: 'start_timestamp',
+            name: 'Start',
+            fieldName: 'start_timestamp',
             minWidth: 90,
             maxWidth: 120,
             isResizable: true,
             isCollapsible: true,
-            ariaLabel: 'Timestamp',
+            ariaLabel: 'Start',
+            data: 'string',
+            onColumnClick: onColumnClick,
+            isPadded: true,
+        },
+        {
+            key: 'end_timestamp',
+            name: 'End',
+            fieldName: 'end_timestamp',
+            minWidth: 90,
+            maxWidth: 120,
+            isResizable: true,
+            isCollapsible: true,
+            ariaLabel: 'End',
             data: 'string',
             onColumnClick: onColumnClick,
             isPadded: true,
@@ -251,13 +231,13 @@ export const EvaluateFeedback = ({ className }: Props) => {
         <div className={styles.container}>
             <div className=''>
                 <Dropdown
-                        label="Provided in last:"
+                        label="Searched in last:"
                         defaultSelectedKey='4hours'
                         onChange={onTimeSpanChange}
                         placeholder="Select a time range"
                         options={dropdownTimespanOptions}
                         styles={dropdownTimespanStyles}
-                        aria-label="timespan options for feedback to be displayed"
+                        aria-label="timespan options for search to be displayed"
                     />
             </div>
             {isLoading ? (
@@ -265,7 +245,7 @@ export const EvaluateFeedback = ({ className }: Props) => {
                      <Stack className={styles.loadingContainer} verticalAlign="space-between">
                         <Stack.Item grow>
                             <p className={styles.loadingText}>
-                                Getting user feedback
+                                Getting user chat interactions
                                 <span className={styles.loadingdots} />
                             </p>
                         </Stack.Item>

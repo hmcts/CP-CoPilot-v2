@@ -949,6 +949,27 @@ async def getAllUserFeedback(request: Request):
         raise HTTPException(status_code=500, detail=str(ex)) from ex
     return results
 
+@app.post("/getAllUserChatInteractions")
+async def getAllUserChatInteractions(request: Request):
+    """
+    Get the user chat interactions in the last N hours.
+
+    Parameters:
+    - request: The HTTP request object.
+
+    Returns:
+    - results: The status of all chat interactions in the specified timeframe.
+    """
+    json_body = await request.json()
+    timeframe = json_body.get("timeframe")
+    try:
+        results = userChatLog.read_chat_interactions_by_timeframe(timeframe)
+
+    except Exception as ex:
+        log.exception("Exception in /getAllUserChatInteractions")
+        raise HTTPException(status_code=500, detail=str(ex)) from ex
+    return results
+
 app.mount("/", StaticFiles(directory="static"), name="static")
 
 if __name__ == "__main__":

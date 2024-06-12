@@ -433,7 +433,7 @@ const Chat = () => {
                             }
                             <span className={styles.chatEmptyObjectives}>
                                 <i>Knowledge Genie AI (Artificial Intelligence) gives Common Platform Users a way of searching Common Platform knowledge stores to quickly and easily access the latest up to date Common Platform job guidance. <br />
-                                HMCTS is committed to the responsible use of AI. Our 9 principles guide the use of AI to make sure it is appropriate, safe and controlled. Knowledge Genie has been assured and assessed against these Responsible AI Principles. For more details check out our &nbsp;</i>
+                                HMCTS is committed to the responsible use of AI. Our 9 principles guide the use of AI to make sure it is appropriate, safe and controlled. Knowledge Genie has been assured and assessed against these Responsible AI Principles. For more details check out our </i>
                                 <a href="https://intranet.justice.gov.uk/documents/2024/03/hmcts-responsible-ai-approach.pdf/" target="_blank" rel="noopener noreferrer">Responsible AI Approach</a><br/><br/>
                                 {/* <a href="https://github.com/microsoft/PubSec-Info-Assistant/blob/main/docs/transparency.md" target="_blank" rel="noopener noreferrer">Transparency Note</a> */}
                             </span>

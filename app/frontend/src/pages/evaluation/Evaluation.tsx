@@ -8,6 +8,7 @@ import { ITag } from '@fluentui/react/lib/Pickers';
 import { FileStatus } from "../../components/FileStatus/FileStatus";
 import styles from "./Evaluation.module.css";
 import { EvaluateFeedback } from '../../components/EvaluateFeedback';
+import { EvaluateAccuracy } from '../../components/EvaluateAccuracy';
 
 export interface IButtonExampleProps {
     disabled?: boolean;
@@ -26,6 +27,11 @@ const Evaluation = () => {
             <Pivot aria-label="Upload Files Section" className={styles.topPivot} onLinkClick={handleLinkClick}>
                 <PivotItem headerText="Feedback" aria-label="Feedback Tab">
                     <EvaluateFeedback className=""/>
+                </PivotItem>
+            </Pivot>
+            <Pivot aria-label="Accuracy Section" className={styles.topPivot} onLinkClick={handleLinkClick}>
+                <PivotItem headerText="Accuracy" aria-label="Accuracy Tab">
+                    <EvaluateAccuracy className=""/>
                 </PivotItem>
             </Pivot>
         </div>

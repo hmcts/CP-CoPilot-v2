@@ -582,3 +582,22 @@ export async function getAllUserFeedback(options: {timeframe: number}): Promise<
     const results: UserFeedback[] = parsedResponse;
     return results;
 }
+
+export async function getAllUserChatInteractions(options: {timeframe: number}): Promise<UserChatInteraction[]> {
+    const response = await fetch("/getAllUserChatInteractions", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            timeframe: options.timeframe
+            })
+        });
+    
+    const parsedResponse: any = await response.json();
+    if (response.status > 299 || !response.ok) {
+        throw Error(parsedResponse.error || "Unknown error");
+    }
+    const results: UserChatInteraction[] = parsedResponse;
+    return results;
+}
