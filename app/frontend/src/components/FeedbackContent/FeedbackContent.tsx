@@ -119,6 +119,7 @@ export const FeedbackContent = ({ className, whoAmIData, onUserFeedback }: Props
                 options={dropdownAccuracyOptions}
                 styles={dropdownStyles}
                 aria-label="Accuracy Options"
+                required
             />
             <Separator>Ease of use</Separator>
             <Dropdown
@@ -128,6 +129,7 @@ export const FeedbackContent = ({ className, whoAmIData, onUserFeedback }: Props
                 options={dropdownEaseOfUseOptions}
                 styles={dropdownStyles}
                 aria-label="Ease Of Use Options"
+                required
             />
             <Separator>Response Time</Separator>
             <Dropdown
@@ -137,6 +139,7 @@ export const FeedbackContent = ({ className, whoAmIData, onUserFeedback }: Props
                 options={dropdownResponseTimeOptions}
                 styles={dropdownStyles}
                 aria-label="Response Time Options"
+                required
             />
             <Separator>Helpful</Separator>
             <Dropdown
@@ -146,6 +149,7 @@ export const FeedbackContent = ({ className, whoAmIData, onUserFeedback }: Props
                 options={dropdownHelpfulOptions}
                 styles={dropdownStyles}
                 aria-label="Helpful Options"
+                required
             />
             <Separator>Re(usability)</Separator>
             <Dropdown
@@ -155,17 +159,19 @@ export const FeedbackContent = ({ className, whoAmIData, onUserFeedback }: Props
                 options={dropdownReusabilityOptions}
                 styles={dropdownStyles}
                 aria-label="Reusability Options"
+                required
             />
-        <button
-          onClick={handleFeedback}
-          className={classNames(
-            styles.upload_button,
-            ""
-          )}
-          aria-label="Submit Feedback"
-        >
-          Submit Feedback
-        </button>            
+            <br /><br />
+            <button
+              onClick={handleFeedback}
+              className={classNames(
+                styles.upload_button,
+                ""
+              )}
+              aria-label="Submit Feedback"
+            >
+              Submit Feedback
+            </button>            
         </div>
     );
 };

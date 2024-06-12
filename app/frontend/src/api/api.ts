@@ -500,8 +500,15 @@ export async function getFeatureFlags(): Promise<GetFeatureFlagsResponse> {
     return parsedResponse;
 }
 
+// Convert the array into the desired format
+const convertToCitationObject = (fileArray: string[] | undefined) => {
+    return fileArray?.map(file => ({ citation: file }));
+};
+
+
 export async function logUserChatInteraction(user_chat_data: UserChatInteraction | undefined): Promise<StatusLogResponse> {
-    var citations = JSON.stringify(user_chat_data?.CITATIONS);
+    console.log(user_chat_data?.CITATIONS);
+    var citations = convertToCitationObject(user_chat_data?.CITATIONS);
     console.log(citations);
     var response = await fetch("/logUserChatInteraction", {
         method: "POST",

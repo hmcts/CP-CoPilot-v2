@@ -32,6 +32,8 @@ npm run build
 cd ../backend
 mkdir -p ./shared_code
 cp  ../../functions/shared_code/status_log.py ./shared_code
+cp  ../../functions/shared_code/user_chat_log.py ./shared_code
+cp  ../../functions/shared_code/user_feedback_log.py ./shared_code
 cp  ../../functions/shared_code/__init__.py ./shared_code
 
 # zip the webapp content from app/backend to the ./artifacts folders
