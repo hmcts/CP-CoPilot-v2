@@ -2,7 +2,7 @@
 // Licensed under the MIT license.
 
 import { useRef, useState, useEffect } from "react";
-import { Checkbox, Panel, DefaultButton, TextField, SpinButton, Separator, Toggle, Label } from "@fluentui/react";
+import { Checkbox, Panel, DefaultButton, TextField, SpinButton, Separator, Toggle, Label, IconButton, Text } from "@fluentui/react";
 import Switch from 'react-switch';
 import { GlobeFilled, BuildingMultipleFilled, AddFilled, ChatSparkleFilled } from "@fluentui/react-icons";
 import { ITag } from '@fluentui/react/lib/Pickers';
@@ -28,6 +28,7 @@ import { FeedbackContent } from "../../components/FeedbackContent/FeedbackConten
 import { FolderPicker } from "../../components/FolderPicker";
 import { TagPickerInline } from "../../components/TagPicker";
 import React from "react";
+import { FeedbackButton } from "../../components/FeedbackButton";
 
 const Chat = () => {
     const [isConfigPanelOpen, setIsConfigPanelOpen] = useState(false);
@@ -401,6 +402,7 @@ const Chat = () => {
                     {whoAmIData?.USER_ROLES == "Admin" &&
                         <InfoButton className={styles.commandButton} onClick={() => setIsInfoPanelOpen(!isInfoPanelOpen)} />
                     }
+                    <FeedbackButton className={styles.commandButton} onClick={() => setIsFeedbackPanelOpen(!isFeedbackPanelOpen)} />
                 </div>
             </div>
             <div className={styles.chatRoot}>

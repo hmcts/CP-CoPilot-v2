@@ -97,6 +97,26 @@ export const FeedbackContent = ({ className, whoAmIData, onUserFeedback }: Props
 
     // execute the feedback button
     const handleFeedback = (async () => {
+      if(!selectedAccuracyItem?.text) {
+        alert("Please select a response for the Accuracy Question");
+        return
+      }
+      if(!selectedEaseOfuseItem?.text) {
+        alert("Please select a response for the Ease of Use Question");
+        return
+      }
+      if(!selectedResponseTimeItem?.text) {
+        alert("Please select a response for the Response Time Question");
+        return
+      }
+      if(!selectedHelpfulItem?.text) {
+        alert("Please select a response for the Helpful Question");
+        return
+      }
+      if(!selectedReusabilityItem?.text) {
+        alert("Please select a response for the Reusability Question");
+        return
+      }
       const userFeedbackData: UserFeedback = ({
         USER_ID: whoAmIData?.USER_ID, 
         ACCURACY: selectedAccuracyItem?.text, 

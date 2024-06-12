@@ -43,12 +43,6 @@ export function parseAnswerToHtml(answer: string, approach: Approaches, work_cit
 
     // trim any whitespace from the end of the answer after removing follow-up questions
     parsedAnswer = parsedAnswer.trim();
-    if(parsedAnswer != "") {
-        const chatData: UserChatInteraction | undefined = userChatInteraction;
-        chatData!.RESPONSE = parsedAnswer;
-        chatData!.CITATIONS = work_citations;
-        onUserChatInteraction(chatData);
-    }
     var fragments: string[] = [];
     var work_fragments: string[] = [];
     var web_fragments: string[] = [];
@@ -154,6 +148,13 @@ export function parseAnswerToHtml(answer: string, approach: Approaches, work_cit
                 return "";
             }
         });
+        if(parsedAnswer != "") {
+            const chatData: UserChatInteraction | undefined = userChatInteraction;
+            //chatData!.RESPONSE = parsedAnswer;
+            chatData!.RESPONSE = fragments.join("")
+            chatData!.CITATIONS = work_citations;
+            onUserChatInteraction(chatData);
+        }
     }
     if (approach == Approaches.CompareWorkWithWeb || approach == Approaches.CompareWebWithWork) {
         const parts = parsedAnswer.split(/\[([^\]]+)\]/g);

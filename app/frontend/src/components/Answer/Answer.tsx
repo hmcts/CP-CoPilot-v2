@@ -3,7 +3,7 @@
 
 import { useMemo } from "react";
 import { Stack, IconButton } from "@fluentui/react";
-import { ShieldCheckmark20Regular } from '@fluentui/react-icons';
+import { ShieldCheckmark20Regular, WindowNew20Regular } from '@fluentui/react-icons';
 
 import styles from "./Answer.module.css";
 
@@ -95,14 +95,6 @@ export const Answer = ({
                                 disabled={!answer.data_points || !answer.data_points.length}
                             />
                         }
-                        <IconButton
-                            style={{ color: "black" }}
-                            iconProps={{ iconName: "Comment" }}
-                            title="Feedback"
-                            ariaLabel="Feedback"
-                            onClick={() => onFeedbackClicked()}
-                            disabled={false}
-                        />
                     </div>
                 </Stack>
             </Stack.Item>
@@ -148,11 +140,14 @@ export const Answer = ({
                         <span className={styles.citationLearnMore}>Citations:</span>
                         {parsedAnswer.work_citations.map((x, i) => {
                             const path = getCitationFilePath(x);
+                            const pathext: any = path.split("?")[0].split(".").pop();
                             return ( 
-                                 <a key={i} className={styles.citationWork} 
-                                 title={x} onClick={() => onCitationClicked(path, (parsedAnswer.work_sourceFiles as any)[x], (parsedAnswer.pageNumbers as any)[x])}>
-                                 {`${++i}. ${x}`}
-                                </a>
+                                 <span>
+                                    <a key={i} className={styles.citationWork} 
+                                    title={x} onClick={() => onCitationClicked(path, (parsedAnswer.work_sourceFiles as any)[x], (parsedAnswer.pageNumbers as any)[x])}>
+                                    {`${++i}. ${x.split('/').slice(0, -1).join('/')}`}
+                                    </a>
+                                </span>                                
                             );
                         })}
                     </Stack>
