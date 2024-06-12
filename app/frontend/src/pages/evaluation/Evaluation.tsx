@@ -28,8 +28,6 @@ const Evaluation = () => {
                 <PivotItem headerText="Feedback" aria-label="Feedback Tab">
                     <EvaluateFeedback className=""/>
                 </PivotItem>
-            </Pivot>
-            <Pivot aria-label="Accuracy Section" className={styles.topPivot} onLinkClick={handleLinkClick}>
                 <PivotItem headerText="Accuracy" aria-label="Accuracy Tab">
                     <EvaluateAccuracy className=""/>
                 </PivotItem>

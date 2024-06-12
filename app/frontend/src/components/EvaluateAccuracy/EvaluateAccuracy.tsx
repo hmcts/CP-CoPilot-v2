@@ -200,9 +200,9 @@ export const EvaluateAccuracy = ({ className }: Props) => {
             data: 'string',
         },
         {
-            key: 'start_timestamp',
+            key: 'start_time',
             name: 'Start',
-            fieldName: 'start_timestamp',
+            fieldName: 'start_time',
             minWidth: 90,
             maxWidth: 120,
             isResizable: true,
@@ -213,9 +213,9 @@ export const EvaluateAccuracy = ({ className }: Props) => {
             isPadded: true,
         },
         {
-            key: 'end_timestamp',
+            key: 'end_time',
             name: 'End',
-            fieldName: 'end_timestamp',
+            fieldName: 'end_time',
             minWidth: 90,
             maxWidth: 120,
             isResizable: true,
@@ -224,6 +224,17 @@ export const EvaluateAccuracy = ({ className }: Props) => {
             data: 'string',
             onColumnClick: onColumnClick,
             isPadded: true,
+        },
+        {
+            key: 'state',
+            name: 'State',
+            fieldName: 'state',
+            minWidth: 150,
+            maxWidth: 180,
+            isResizable: true,
+            ariaLabel: 'State',
+            onColumnClick: onColumnClick,
+            data: 'string',
         }
     ]);
 
