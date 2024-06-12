@@ -928,6 +928,27 @@ async def logUserFeedback(request: Request):
         raise HTTPException(status_code=500, detail=str(ex)) from ex
     raise HTTPException(status_code=200, detail="Success")
 
+@app.post("/getAllUserFeedback")
+async def getAllUserFeedback(request: Request):
+    """
+    Get the user feedback in the last N hours.
+
+    Parameters:
+    - request: The HTTP request object.
+
+    Returns:
+    - results: The status of all file uploads in the specified timeframe.
+    """
+    json_body = await request.json()
+    timeframe = json_body.get("timeframe")
+    try:
+        results = userFeedbackLog.read_feedback_by_timeframe(timeframe)
+
+    except Exception as ex:
+        log.exception("Exception in /getAllUserFeedback")
+        raise HTTPException(status_code=500, detail=str(ex)) from ex
+    return results
+
 app.mount("/", StaticFiles(directory="static"), name="static")
 
 if __name__ == "__main__":

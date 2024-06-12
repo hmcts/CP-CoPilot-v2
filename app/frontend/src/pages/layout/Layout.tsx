@@ -76,6 +76,13 @@ export const Layout = () => {
                                     </NavLink>
                                 </li>
                             }
+                            {whoAmIData?.USER_ROLES == "Admin" &&
+                                <li className={styles.headerNavLeftMargin}>
+                                    <NavLink to="/evaluation" className={({ isActive }) => (isActive ? styles.headerNavPageLinkActive : styles.headerNavPageLink)}>
+                                        Evaluation
+                                    </NavLink>
+                                </li>
+                            }
                             {featureFlags?.ENABLE_MATH_ASSISTANT &&
                                 <li className={styles.headerNavLeftMargin}>
                                     <NavLink to="/tutor" className={({ isActive }) => (isActive ? styles.headerNavPageLinkActive : styles.headerNavPageLink)}>

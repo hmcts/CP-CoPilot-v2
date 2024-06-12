@@ -14,6 +14,7 @@ import Chat from "./pages/chat/Chat";
 import Content from "./pages/content/Content";
 import Tutor from "./pages/tutor/Tutor";
 import { Tda } from "./pages/tda/Tda";
+import Evaluation from "./pages/evaluation/Evaluation";
 
 initializeIcons();
 
@@ -25,6 +26,7 @@ export default function App() {
                 <Route path="/" element={<Layout />}>
                     <Route index element={<Chat />} />
                     <Route path="content" element={<Content />} />
+                    <Route path="evaluation" element={<Evaluation />} />
                     <Route path="*" element={<NoPage />} />
                     <Route path="tutor" element={<Tutor />} />
                     <Route path="tda" element={<Tda folderPath={""} tags={[]} />} />

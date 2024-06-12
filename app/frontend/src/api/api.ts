@@ -563,3 +563,22 @@ export async function logUserFeedback(user_feedback_data: UserFeedback | undefin
     var results: StatusLogResponse = {status: parsedResponse.status};
     return results;
 }
+
+export async function getAllUserFeedback(options: {timeframe: number}): Promise<UserFeedback[]> {
+    const response = await fetch("/getAllUserFeedback", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            timeframe: options.timeframe
+            })
+        });
+    
+    const parsedResponse: any = await response.json();
+    if (response.status > 299 || !response.ok) {
+        throw Error(parsedResponse.error || "Unknown error");
+    }
+    const results: UserFeedback[] = parsedResponse;
+    return results;
+}
