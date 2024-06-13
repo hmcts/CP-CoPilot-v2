@@ -50,6 +50,7 @@ class UserChatLog:
         try:
             json_document = {
                 "id": user + " " + start_time,
+                "file_name": user + " " + start_time,
                 "user": user,
                 "prompt": prompt,
                 "start_time": start_time,
@@ -115,14 +116,14 @@ class UserChatLog:
         logging.info("%s Start - %s", log_id, state)
 
         try:
-            response = self.container.read_item(item=log_id, partition_key=log_id)
-            json_document = response.get('resource')
+            json_document = self.container.read_item(item=log_id, partition_key=log_id)
 
             # Check if the document is found
             if json_document:
                 json_document['state'] = state
                 json_document['review_comment'] = review_comment
-                self.container.replace_item(item=json_document['id'], body=json_document)
+                self.container.upsert_item(body=json_document);
+                #self.container.replace_item(item=json_document['id'], body=json_document)
             else:
                 logging.error("Document with id %s not found. State=%s; ReviewComment=%s", log_id, state, review_comment)
 

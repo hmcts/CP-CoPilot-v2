@@ -147,6 +147,11 @@ export const Answer = ({
                                     title={x} onClick={() => onCitationClicked(path, (parsedAnswer.work_sourceFiles as any)[x], (parsedAnswer.pageNumbers as any)[x])}>
                                     {`${++i}. ${x.split('/').slice(0, -1).join('/')}`}
                                     </a>
+                                    {/*["docx", "xlsx", "pptx"].includes(pathext) ? (
+                                        <a title="Open in New Window" href={'https://view.officeapps.live.com/op/embed.aspx?src=' + encodeURIComponent(path as string) + "&action=embedview&wdStartOn=" + (parsedAnswer.pageNumbers as any)[x]} target="_blank" rel="noopener noreferrer"><WindowNew20Regular></WindowNew20Regular></a>
+                                    ) : (
+                                        <a title="Open in New Window" href={path + "&page=" + (parsedAnswer.pageNumbers as any)[x]} target="_blank" rel="noopener noreferrer"><WindowNew20Regular></WindowNew20Regular></a>
+                                    )*/}
                                 </span>                                
                             );
                         })}
