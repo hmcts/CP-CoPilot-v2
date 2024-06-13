@@ -264,7 +264,7 @@ export const EvaluateFeedback = ({ className }: Props) => {
 
     return (
         <div className={styles.container}>
-            <div className=''>
+            <div className={`${styles.options} ${className ?? ""}`} >
                 <Dropdown
                         label="Provided in last:"
                         defaultSelectedKey='4hours'

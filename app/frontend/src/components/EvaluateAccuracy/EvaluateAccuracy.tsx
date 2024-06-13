@@ -160,7 +160,7 @@ export const EvaluateAccuracy = ({ className }: Props) => {
 
         const req = {
             timeframe: timeframe,
-            state: selectedAccuracyStateItem?.key == undefined ? AccuracyState.ALL : selectedAccuracyStateItem?.key as AccuracyState,
+            state: selectedAccuracyStateItem?.key == undefined ? "All" : selectedAccuracyStateItem?.key as string,
             user: selectedUser
         }
         const response = await getAllUserChatInteractions(req);
@@ -342,7 +342,7 @@ export const EvaluateAccuracy = ({ className }: Props) => {
 
     return (
         <div className={styles.container}>
-            <div className=''>
+            <div className={`${styles.options} ${className ?? ""}`} >
                 <Dropdown
                         label="Searched in last:"
                         defaultSelectedKey='4hours'

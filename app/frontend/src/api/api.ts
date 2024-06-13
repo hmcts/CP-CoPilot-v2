@@ -585,7 +585,7 @@ export async function getAllUserFeedback(options: {timeframe: number, user: stri
     return results;
 }
 
-export async function getAllUserChatInteractions(options: {timeframe: number, state: AccuracyState, user: string}): Promise<UserChatInteraction[]> {
+export async function getAllUserChatInteractions(options: {timeframe: number, state: string, user: string}): Promise<UserChatInteraction[]> {
     const response = await fetch("/getAllUserChatInteractions", {
         method: "POST",
         headers: {

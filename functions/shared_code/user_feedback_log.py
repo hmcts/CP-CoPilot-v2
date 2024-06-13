@@ -76,7 +76,7 @@ class UserFeedbackLog:
             conditions.append(f"c.timestamp > '{from_time_string}'")
         
         if user != '':
-            conditions.append(f"STARTSWITH(c.user, '{user}')")
+            conditions.append(f"STARTSWITH(LOWER(c.user), '{user.lower()}')")
 
         if conditions:
             query_string += " WHERE " + " AND ".join(conditions)

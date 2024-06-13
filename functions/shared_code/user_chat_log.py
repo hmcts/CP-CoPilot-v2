@@ -90,7 +90,7 @@ class UserChatLog:
             conditions.append(f"c.state = '{state.value}'")
 
         if user != '':
-            conditions.append(f"STARTSWITH(c.user, '{user}')")
+            conditions.append(f"STARTSWITH(LOWER(c.user), '{user.lower()}')")
 
         if conditions:
             query_string += " WHERE " + " AND ".join(conditions)
@@ -104,17 +104,17 @@ class UserChatLog:
 
         return items
 
-    def review_comment(id, state, review_comment):
+    def review_comment(self, id, state, review_comment):
         """ Function to update the review comment for a specified id """
 
         # add to standard logger
         logging.info("%s Start - %s", id, state)
 
         try:
-            json_document = self.container.read_item(item=id)
+            json_document = self.container.read_item(item=id, partition_key='')
             json_document['state'] = state
             json_document['review_comment'] = review_comment
-            self.container.replace_time(item=json_document, body=json_document)
+            self.container.replace_item(item=json_document, body=json_document)
 
         except Exception as err:
             # log the exception with stack trace to the status log

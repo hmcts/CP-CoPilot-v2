@@ -338,6 +338,7 @@ const Chat = () => {
     };
 
     const onShowCitation = (citation: string, citationSourceFile: string, citationSourceFilePageNumber: string, index: number) => {
+        console.log("onShowCitation = " + citationSourceFile);
         if (activeCitation === citation && activeAnalysisPanelTab === AnalysisPanelTabs.CitationTab && selectedAnswer === index) {
             setActiveAnalysisPanelTab(undefined);
         } else {

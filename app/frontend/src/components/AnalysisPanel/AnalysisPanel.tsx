@@ -60,6 +60,9 @@ export const AnalysisPanel = ({ answer, activeTab, activeCitation, sourceFile, p
         if (!sourceFile) {
             return;
         }
+        else {
+            console.log("sourceFile = " + sourceFile);
+        }
         const fetchMarkdownContent = async () => {
             try {
                 const response = await fetch(sourceFile!);
