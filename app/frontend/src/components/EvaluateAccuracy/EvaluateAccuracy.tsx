@@ -28,7 +28,7 @@ const dropdownTimespanOptions = [
   const dropdownAccuracyStateOptions = [
     { key: 'AccuraceyStates', text: 'Accuracy States', itemType: DropdownMenuItemType.Header },
     { key: AccuracyState.ALL, text: 'All' },
-    { key: AccuracyState.UNEVALUATED, text: 'All' },
+    { key: AccuracyState.UNEVALUATED, text: 'Unevaluated' },
     { key: AccuracyState.CORRECT, text: 'Correct' },
     { key: AccuracyState.INCORRECT, text: 'Incorrect' },
     { key: AccuracyState.PARTIAL, text: 'Partial' },
@@ -42,7 +42,7 @@ export const EvaluateAccuracy = ({ className }: Props) => {
     const [selectedTimeFrameItem, setSelectedTimeFrameItem] = useState<IDropdownOption>();
     const [selectedAccuracyStateItem, setSelectedAccuracyStateItem] = useState<IDropdownOption>();
     const [selectedUser, setSelectedUser] = useState<string>('');
-    const [value, setValue] = useState<UserChatInteraction>();
+    const [value, setValue] = useState<any>();
     const [stateDialogVisible, setStateDialogVisible] = useState(false);
     const [userAccuracyStateChange, setUserAccuracyStateChange] = useState<IDropdownOption>();
     const [userReviewCommentChange, setUserReviewCommentChange] = useState<string>('');
@@ -235,10 +235,10 @@ export const EvaluateAccuracy = ({ className }: Props) => {
             ariaLabel: 'Accuracy',
             onColumnClick: onColumnClick,
             data: 'string',
-            onRender: (item: UserChatInteraction) => (
-                <TooltipHost content={`${item.PROMPT} `}>
+            onRender: (item: any) => (
+                <TooltipHost content={`${item.prompt} `}>
                     <span onClick={() => onStateColumnClick(item)} style={{ cursor: 'pointer' }}>
-                        {item.PROMPT}
+                        {item.prompt}
                     </span>
                 </TooltipHost>
             ), 
@@ -253,10 +253,10 @@ export const EvaluateAccuracy = ({ className }: Props) => {
             ariaLabel: 'Response',
             onColumnClick: onColumnClick,
             data: 'string',
-            onRender: (item: UserChatInteraction) => (
-                <TooltipHost content={`${item.RESPONSE} `}>
+            onRender: (item: any) => (
+                <TooltipHost content={`${item.response} `}>
                     <span onClick={() => onStateColumnClick(item)} style={{ cursor: 'pointer' }}>
-                        {item.RESPONSE}
+                        {item.response}
                     </span>
                 </TooltipHost>
             ), 
@@ -291,16 +291,16 @@ export const EvaluateAccuracy = ({ className }: Props) => {
             key: 'state',
             name: 'State',
             fieldName: 'state',
-            minWidth: 150,
-            maxWidth: 180,
+            minWidth: 90,
+            maxWidth: 120,
             isResizable: true,
             ariaLabel: 'State',
             onColumnClick: onColumnClick,
             data: 'string',
-            onRender: (item: UserChatInteraction) => (
-                <TooltipHost content={`${item.STATE} `}>
+            onRender: (item: any) => (
+                <TooltipHost content={`${item.state} `}>
                     <span onClick={() => onStateColumnClick(item)} style={{ cursor: 'pointer' }}>
-                        {item.STATE}
+                        {item.state}
                     </span>
                 </TooltipHost>
             ), 
@@ -315,8 +315,8 @@ export const EvaluateAccuracy = ({ className }: Props) => {
         };
     }
 
-    const DisplayData=value?.CITATIONS.map(
-        (citation)=>{
+    const DisplayData=value?.citations.map(
+        (citation : any)=>{
             return(
                 <tr>
                     <td>{citation}</td>
@@ -328,7 +328,7 @@ export const EvaluateAccuracy = ({ className }: Props) => {
     async function handleUpdate() {
         try {
             const reviewComment = ({
-                id: value?.ID,
+                id: value?.id,
                 state: userAccuracyStateChange?.text, 
                 review_comment: userReviewCommentChange 
               });
@@ -354,7 +354,7 @@ export const EvaluateAccuracy = ({ className }: Props) => {
                     />
                 <Dropdown
                         label="Accuracy State:"
-                        defaultSelectedKey={'ALL'}
+                        defaultSelectedKey={'All'}
                         onChange={onAccuracyStateChange}
                         placeholder="Select accuracy states"
                         options={dropdownAccuracyStateOptions}
@@ -410,8 +410,8 @@ export const EvaluateAccuracy = ({ className }: Props) => {
                     >
                         <div className={styles.resultspanel}>
                             <div>
-                                <Label>Prompt</Label><Text>{value?.PROMPT}</Text>
-                                <Label>Response</Label><Text>{value?.RESPONSE}</Text>
+                                <Label>Prompt</Label><Text>{value?.prompt}</Text>
+                                <Label>Response</Label><Text>{value?.response}</Text>
                                 <table className="table table-striped">
                                     <thead>
                                         <tr>
@@ -425,15 +425,14 @@ export const EvaluateAccuracy = ({ className }: Props) => {
                                 <Label>State</Label>
                                 <Dropdown
                                     label="Accuracy State:"
-                                    defaultSelectedKey={value?.STATE}
+                                    defaultSelectedKey={value?.state}
                                     onChange={onUserAccuracyStateChange}
                                     placeholder="Select accuracy states"
                                     options={dropdownAccuracyStateOptions}
                                     styles={dropdownTimespanStyles}
                                     aria-label="accuracy state options for accuracy statuses to be displayed"
                                 />
-                                <Label>Review Comment</Label>
-                                <TextField styles={getStyles} onChange={onUserReviewCommentChange} value={value?.REVIEW_COMMENT}/>
+                                <TextField label='Review Comment:' styles={getStyles} onChange={onUserReviewCommentChange}/>
                                 <br /><br />
                                 <button
                                 onClick={handleUpdate}

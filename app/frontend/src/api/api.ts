@@ -602,7 +602,7 @@ export async function getAllUserChatInteractions(options: {timeframe: number, st
     if (response.status > 299 || !response.ok) {
         throw Error(resp.error || "Unknown error");
     }
-    const parsedResponse = resp.map((item: { id: any; user: any; prompt: any; response: any; start_time: any; end_time: any; state: any; citations: any[]; }) => ({
+    const parsedResponse = resp.map((item: {review_comment: any; id: any; user: any; prompt: any; response: any; start_time: any; end_time: any; state: any; citations: any[]; }) => ({
         id: item.id,
         user: item.user,
         prompt: item.prompt,
@@ -610,7 +610,7 @@ export async function getAllUserChatInteractions(options: {timeframe: number, st
         start_time: item.start_time,
         end_time: item.end_time,
         state: item.state,
-        review_comment: item.end_time,
+        review_comment: item.review_comment,
         citations: item.citations.map(subItem => subItem.document)
     }));
     const results: UserChatInteraction[] = parsedResponse;
@@ -627,6 +627,29 @@ export async function logUserReviewComment(review_comment_data: {id: string | un
             "id": review_comment_data.id,
             "state": review_comment_data.state,
             "review_comment": review_comment_data.review_comment,
+            })
+    });
+
+    var parsedResponse: StatusLogResponse = await response.json();
+    if (response.status > 299 || !response.ok) {
+        throw Error(parsedResponse.error || "Unknown error");
+    }
+
+    var results: StatusLogResponse = {status: parsedResponse.status};
+    return results;
+}
+
+export async function logUserEvent(user : string | undefined, typ : string, comment: string, timestamp: string): Promise<StatusLogResponse> {
+    var response = await fetch("/logUserEvent", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            "user": user,
+            "type": typ,
+            "comment": comment,
+            "timestamp": timestamp,
             })
     });
 

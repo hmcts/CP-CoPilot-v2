@@ -11,7 +11,7 @@ import styles from "./Chat.module.css";
 import rlbgstyles from "../../components/ResponseLengthButtonGroup/ResponseLengthButtonGroup.module.css";
 import rtbgstyles from "../../components/ResponseTempButtonGroup/ResponseTempButtonGroup.module.css";
 
-import { chatApi, Approaches, ChatResponse, ChatRequest, ChatTurn, ChatMode, getFeatureFlags, GetFeatureFlagsResponse, GetWhoAmIResponse, UserChatInteraction, logUserChatInteraction, UserFeedback, logUserFeedback } from "../../api";
+import { chatApi, Approaches, ChatResponse, ChatRequest, ChatTurn, ChatMode, getFeatureFlags, GetFeatureFlagsResponse, GetWhoAmIResponse, UserChatInteraction, logUserChatInteraction, UserFeedback, logUserFeedback, logUserEvent } from "../../api";
 import { Answer, AnswerError, AnswerLoading } from "../../components/Answer";
 import { QuestionInput } from "../../components/QuestionInput";
 import { ExampleList } from "../../components/Example";
@@ -103,6 +103,8 @@ const Chat = () => {
 
             setWhoAmIData({USER_NAME: user_name, USER_ROLES: user_roles, USER_ID: user_id});
 
+            logEvent(user_id, "access", "Chat");
+
         } catch (error) {
             // Handle the error here
             console.log(error);
@@ -127,6 +129,15 @@ const Chat = () => {
             console.log(error);
         }
         setIsFeedbackPanelOpen(false);
+    }
+
+    async function logEvent(user: string | undefined, typ: string, comment: string) {
+        try {
+            await logUserEvent(user, typ, comment, new Date().toISOString());
+        } catch (error) {
+            // Handle the error here
+            console.log(error);
+        }
     }
 
     const makeApiRequest = async (question: string, approach: Approaches, 
@@ -339,6 +350,7 @@ const Chat = () => {
 
     const onShowCitation = (citation: string, citationSourceFile: string, citationSourceFilePageNumber: string, index: number) => {
         console.log("onShowCitation = " + citationSourceFile);
+        logEvent(whoAmIData?.USER_ID, "citation", citationSourceFile)
         if (activeCitation === citation && activeAnalysisPanelTab === AnalysisPanelTabs.CitationTab && selectedAnswer === index) {
             setActiveAnalysisPanelTab(undefined);
         } else {

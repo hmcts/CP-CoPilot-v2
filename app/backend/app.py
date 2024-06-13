@@ -48,7 +48,7 @@ from approaches.tabulardataassistant import (
 
 )
 from shared_code.status_log import State, StatusClassification, StatusLog, StatusQueryLevel
-from shared_code.user_chat_log import AccuracyState, State, UserChatLog
+from shared_code.user_chat_log import AccuracyState, UserChatLog
 from shared_code.user_feedback_log import UserFeedbackLog
 from azure.cosmos import CosmosClient
 
@@ -966,7 +966,7 @@ async def getAllUserChatInteractions(request: Request):
     state = json_body.get("state")
     user = json_body.get("user")
     try:
-        results = userChatLog.read_chat_interactions_by_timeframe(timeframe, AccuracyState[state], user)
+        results = userChatLog.read_chat_interactions_by_timeframe(timeframe, state, user)
 
     except Exception as ex:
         log.exception("Exception in /getAllUserChatInteractions")
@@ -999,6 +999,35 @@ async def logUserReviewComment(request: Request):
         log.exception("Exception in /logUserReviewComment")
         raise HTTPException(status_code=500, detail=str(ex)) from ex
     raise HTTPException(status_code=200, detail="Success")
+
+
+@app.post("/logUserEvent")
+async def logUserEvent(request: Request):
+    """
+    Log the user event to CosmosDB.
+
+    Parameters:
+    - request: Request object containing the HTTP request data.
+
+    Returns:
+    - A dictionary with the status code 200 if successful, or an error
+        message with status code 500 if an exception occurs.
+    """
+
+    try:
+        json_body = await request.json()
+        user = json_body.get("user")
+        typ = json_body.get("type")
+        comment = json_body.get("comment")
+        timestamp = json_body.get("timestamp")
+
+        userChatLog.log_event(user, typ, comment, timestamp)
+
+    except Exception as ex:
+        log.exception("Exception in /logstatus")
+        raise HTTPException(status_code=500, detail=str(ex)) from ex
+    raise HTTPException(status_code=200, detail="Success")
+
 
 app.mount("/", StaticFiles(directory="static"), name="static")
 

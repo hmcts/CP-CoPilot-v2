@@ -242,7 +242,7 @@ export type UserChatInteraction = {
     CITATIONS: string[];
     START_TIMESTAMP: string;
     END_TIMESTAMP: string;
-    STATE?: AccuracyState;
+    STATE?: string;
     REVIEW_COMMENT?: string;
     error?: string;
 };
