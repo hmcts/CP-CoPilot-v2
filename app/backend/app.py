@@ -48,7 +48,7 @@ from approaches.tabulardataassistant import (
 
 )
 from shared_code.status_log import State, StatusClassification, StatusLog, StatusQueryLevel
-from shared_code.user_chat_log import UserChatLog
+from shared_code.user_chat_log import AccuracyState, State, UserChatLog
 from shared_code.user_feedback_log import UserFeedbackLog
 from azure.cosmos import CosmosClient
 
@@ -966,7 +966,7 @@ async def getAllUserChatInteractions(request: Request):
     state = json_body.get("state")
     user = json_body.get("user")
     try:
-        results = userChatLog.read_chat_interactions_by_timeframe(timeframe, state, user)
+        results = userChatLog.read_chat_interactions_by_timeframe(timeframe, AccuracyState[state], user)
 
     except Exception as ex:
         log.exception("Exception in /getAllUserChatInteractions")

@@ -9,7 +9,7 @@ import logging
 from azure.cosmos import CosmosClient, PartitionKey, exceptions
 import traceback, sys
 
-class State(Enum):
+class AccuracyState(Enum):
     """ Enum for state of a chat """
     UNEVALUATED = "Unevaluated"
     CORRECT = "Correct"
@@ -56,7 +56,7 @@ class UserChatLog:
                 "response": response,
                 "citations": citations,
                 "end_time": end_time,
-                "state": str(State.UNEVALUATED.value),
+                "state": str(AccuracyState.UNEVALUATED.value),
                 "review_comment": ""
             }
             self.container.upsert_item(body=json_document)
@@ -67,7 +67,7 @@ class UserChatLog:
 
     def read_chat_interactions_by_timeframe(self,
                        within_n_hours: int,
-                       state: State = State.ALL,
+                       state: AccuracyState = AccuracyState.ALL,
                        user: str = ''
                        ):
         """ 
@@ -86,7 +86,7 @@ class UserChatLog:
             from_time_string = str(from_time.strftime('%Y-%m-%d %H:%M:%S'))
             conditions.append(f"c.start_time > '{from_time_string}'")
 
-        if state != State.ALL:
+        if state != AccuracyState.ALL:
             conditions.append(f"c.state = '{state.value}'")
 
         if user != '':
