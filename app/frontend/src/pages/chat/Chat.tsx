@@ -600,7 +600,7 @@ const Chat = () => {
                     isBlocking={false}
                     onDismiss={() => setIsFeedbackPanelOpen(false)}
                     closeButtonAriaLabel="Close"
-                    onRenderFooterContent={() => <DefaultButton onClick={() => setIsFeedbackPanelOpen(false)}>Close</DefaultButton>}
+                    onRenderFooterContent={() => <Text>Please answer all questions and click on Submit Feedback button</Text>} /*<DefaultButton onClick={() => setIsFeedbackPanelOpen(false)}>Close</DefaultButton>}*/
                     isFooterAtBottom={true}                >
                     <div className={styles.resultspanel}>
                         <FeedbackContent 

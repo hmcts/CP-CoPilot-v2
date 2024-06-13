@@ -3,14 +3,14 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Dropdown, DropdownMenuItemType, IDropdownOption, IDropdownStyles } from '@fluentui/react/lib/Dropdown';
-import { DefaultButton, DetailsList, DetailsListLayoutMode, Dialog, DialogFooter, DialogType, IColumn, Panel, PanelType, PrimaryButton, SelectionMode, Stack, TooltipHost } from "@fluentui/react";
+import { DefaultButton, DetailsList, DetailsListLayoutMode, Dialog, DialogFooter, DialogType, IColumn, ITextFieldStyleProps, ITextFieldStyles, Panel, PanelType, PrimaryButton, SelectionMode, Stack, TextField, TooltipHost } from "@fluentui/react";
 import { animated, useSpring } from "@react-spring/web";
 import { getAllUploadStatus, FileUploadBasicStatus, GetUploadStatusRequest, FileState, UserFeedback, getAllUserFeedback } from "../../api";
 
 import styles from "./EvaluateFeedback.module.css";
 import { ArrowClockwise24Regular, DocumentFolderFilled, ImageBorderFilled } from "@fluentui/react-icons";
 //import { IDocument } from "../FileStatus/DocumentsDetailList";
-import { StatusContent } from "../StatusContent/StatusContent";
+//import { StatusContent } from "../StatusContent/StatusContent";
 
 const dropdownTimespanStyles: Partial<IDropdownStyles> = { dropdown: { width: 150 } };
 
@@ -30,12 +30,18 @@ interface Props {
 
 export const EvaluateFeedback = ({ className }: Props) => {
     const [selectedTimeFrameItem, setSelectedTimeFrameItem] = useState<IDropdownOption>();
+    const [selectedUser, setSelectedUser] = useState<string>('');
+
 
     const [files, setFiles] = useState<UserFeedback[]>();
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const onTimeSpanChange = (event: React.FormEvent<HTMLDivElement>, item: IDropdownOption<any> | undefined): void => {
         setSelectedTimeFrameItem(item);
+    };
+
+    const onUserChange = (_ev?: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string) => {
+        setSelectedUser(newValue || "");
     };
 
     const onColumnClick = (ev: React.MouseEvent<HTMLElement>, column: IColumn): void => {
@@ -113,7 +119,8 @@ export const EvaluateFeedback = ({ className }: Props) => {
         }
 
         const req = {
-            timeframe: timeframe
+            timeframe: timeframe,
+            user: selectedUser
         }
         const response = await getAllUserFeedback(req);
         setIsLoading(false);
@@ -247,6 +254,14 @@ export const EvaluateFeedback = ({ className }: Props) => {
         }
     ]);
 
+    function getStyles(props: ITextFieldStyleProps): Partial<ITextFieldStyles> {
+        return {
+          fieldGroup: [
+            { width: 300 },
+          ]
+        };
+    }
+
     return (
         <div className={styles.container}>
             <div className=''>
@@ -259,6 +274,7 @@ export const EvaluateFeedback = ({ className }: Props) => {
                         styles={dropdownTimespanStyles}
                         aria-label="timespan options for feedback to be displayed"
                     />
+                <TextField label='User:' styles={getStyles} onChange={onUserChange}/>
             </div>
             {isLoading ? (
                 <animated.div style={{ ...animatedStyles }}>

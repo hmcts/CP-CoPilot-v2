@@ -941,8 +941,9 @@ async def getAllUserFeedback(request: Request):
     """
     json_body = await request.json()
     timeframe = json_body.get("timeframe")
+    user = json_body.get("user")
     try:
-        results = userFeedbackLog.read_feedback_by_timeframe(timeframe)
+        results = userFeedbackLog.read_feedback_by_timeframe(timeframe, user)
 
     except Exception as ex:
         log.exception("Exception in /getAllUserFeedback")
@@ -962,13 +963,42 @@ async def getAllUserChatInteractions(request: Request):
     """
     json_body = await request.json()
     timeframe = json_body.get("timeframe")
+    state = json_body.get("state")
+    user = json_body.get("user")
     try:
-        results = userChatLog.read_chat_interactions_by_timeframe(timeframe)
+        results = userChatLog.read_chat_interactions_by_timeframe(timeframe, state, user)
 
     except Exception as ex:
         log.exception("Exception in /getAllUserChatInteractions")
         raise HTTPException(status_code=500, detail=str(ex)) from ex
     return results
+
+
+@app.post("/logUserReviewComment")
+async def logUserReviewComment(request: Request):
+    """
+    Log the user Review Comment to CosmosDB.
+
+    Parameters:
+    - request: Request object containing the HTTP request data.
+
+    Returns:
+    - A dictionary with the status code 200 if successful, or an error
+        message with status code 500 if an exception occurs.
+    """
+
+    try:
+        json_body = await request.json()
+        id = json_body.get("id")
+        state = json_body.get("state")
+        review_comment = json_body.get("review_comment")
+
+        userChatLog.review_comment(id, state, review_comment)
+
+    except Exception as ex:
+        log.exception("Exception in /logUserReviewComment")
+        raise HTTPException(status_code=500, detail=str(ex)) from ex
+    raise HTTPException(status_code=200, detail="Success")
 
 app.mount("/", StaticFiles(directory="static"), name="static")
 

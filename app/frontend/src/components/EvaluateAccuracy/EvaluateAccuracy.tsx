@@ -3,14 +3,15 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Dropdown, DropdownMenuItemType, IDropdownOption, IDropdownStyles } from '@fluentui/react/lib/Dropdown';
-import { DefaultButton, DetailsList, DetailsListLayoutMode, Dialog, DialogFooter, DialogType, IColumn, Panel, PanelType, PrimaryButton, SelectionMode, Stack, TooltipHost } from "@fluentui/react";
+import { DefaultButton, DetailsList, DetailsListLayoutMode, Dialog, DialogFooter, DialogType, IColumn, ITextField, ITextFieldStyleProps, ITextFieldStyles, Label, Panel, PanelType, PrimaryButton, SelectionMode, Stack, TextField, TooltipHost, Text } from "@fluentui/react";
 import { animated, useSpring } from "@react-spring/web";
-import { getAllUploadStatus, FileUploadBasicStatus, GetUploadStatusRequest, FileState, UserFeedback, getAllUserChatInteractions, UserChatInteraction } from "../../api";
+import { getAllUploadStatus, FileUploadBasicStatus, GetUploadStatusRequest, FileState, UserFeedback, getAllUserChatInteractions, UserChatInteraction, AccuracyState, logUserReviewComment } from "../../api";
 
 import styles from "./EvaluateAccuracy.module.css";
 import { ArrowClockwise24Regular, DocumentFolderFilled, ImageBorderFilled } from "@fluentui/react-icons";
 //import { IDocument } from "../FileStatus/DocumentsDetailList";
 import { StatusContent } from "../StatusContent/StatusContent";
+import classNames from "classnames";
 
 const dropdownTimespanStyles: Partial<IDropdownStyles> = { dropdown: { width: 150 } };
 
@@ -24,18 +25,63 @@ const dropdownTimespanOptions = [
     { key: '-1days', text: 'All' },
   ];
 
+  const dropdownAccuracyStateOptions = [
+    { key: 'AccuraceyStates', text: 'Accuracy States', itemType: DropdownMenuItemType.Header },
+    { key: AccuracyState.ALL, text: 'All' },
+    { key: AccuracyState.UNEVALUATED, text: 'All' },
+    { key: AccuracyState.CORRECT, text: 'Correct' },
+    { key: AccuracyState.INCORRECT, text: 'Incorrect' },
+    { key: AccuracyState.PARTIAL, text: 'Partial' },
+  ];
+
 interface Props {
     className?: string;
 }
 
 export const EvaluateAccuracy = ({ className }: Props) => {
     const [selectedTimeFrameItem, setSelectedTimeFrameItem] = useState<IDropdownOption>();
+    const [selectedAccuracyStateItem, setSelectedAccuracyStateItem] = useState<IDropdownOption>();
+    const [selectedUser, setSelectedUser] = useState<string>('');
+    const [value, setValue] = useState<UserChatInteraction>();
+    const [stateDialogVisible, setStateDialogVisible] = useState(false);
+    const [userAccuracyStateChange, setUserAccuracyStateChange] = useState<IDropdownOption>();
+    const [userReviewCommentChange, setUserReviewCommentChange] = useState<string>('');
 
     const [files, setFiles] = useState<UserChatInteraction[]>();
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const onTimeSpanChange = (event: React.FormEvent<HTMLDivElement>, item: IDropdownOption<any> | undefined): void => {
         setSelectedTimeFrameItem(item);
+    };
+
+    const onUserAccuracyStateChange = (event: React.FormEvent<HTMLDivElement>, item: IDropdownOption<any> | undefined): void => {
+        setUserAccuracyStateChange(item);
+    };
+
+    const onAccuracyStateChange = (event: React.FormEvent<HTMLDivElement>, item: IDropdownOption<any> | undefined): void => {
+        setSelectedAccuracyStateItem(item);
+    };
+
+    const onUserChange = (_ev?: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string) => {
+        setSelectedUser(newValue || "");
+    };
+
+    const onUserReviewCommentChange = (_ev?: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string) => {
+        setUserReviewCommentChange(newValue || "");
+    };
+
+    const refreshProp = (item: UserChatInteraction) => {
+        setValue(item);
+    };
+
+    const onStateColumnClick = (item: UserChatInteraction) => {
+        try {
+            refreshProp(item);
+            setStateDialogVisible(true);
+        } catch (error) {
+            console.error("Error on column click:", error);
+            // Handle error here, perhaps show an error message to the user
+        }
     };
 
     const onColumnClick = (ev: React.MouseEvent<HTMLElement>, column: IColumn): void => {
@@ -113,7 +159,9 @@ export const EvaluateAccuracy = ({ className }: Props) => {
         }
 
         const req = {
-            timeframe: timeframe
+            timeframe: timeframe,
+            state: selectedAccuracyStateItem?.key == undefined ? AccuracyState.ALL : selectedAccuracyStateItem?.key as AccuracyState,
+            user: selectedUser
         }
         const response = await getAllUserChatInteractions(req);
         setIsLoading(false);
@@ -187,6 +235,13 @@ export const EvaluateAccuracy = ({ className }: Props) => {
             ariaLabel: 'Accuracy',
             onColumnClick: onColumnClick,
             data: 'string',
+            onRender: (item: UserChatInteraction) => (
+                <TooltipHost content={`${item.PROMPT} `}>
+                    <span onClick={() => onStateColumnClick(item)} style={{ cursor: 'pointer' }}>
+                        {item.PROMPT}
+                    </span>
+                </TooltipHost>
+            ), 
         },
         {
             key: 'response',
@@ -198,6 +253,13 @@ export const EvaluateAccuracy = ({ className }: Props) => {
             ariaLabel: 'Response',
             onColumnClick: onColumnClick,
             data: 'string',
+            onRender: (item: UserChatInteraction) => (
+                <TooltipHost content={`${item.RESPONSE} `}>
+                    <span onClick={() => onStateColumnClick(item)} style={{ cursor: 'pointer' }}>
+                        {item.RESPONSE}
+                    </span>
+                </TooltipHost>
+            ), 
         },
         {
             key: 'start_time',
@@ -235,8 +297,48 @@ export const EvaluateAccuracy = ({ className }: Props) => {
             ariaLabel: 'State',
             onColumnClick: onColumnClick,
             data: 'string',
+            onRender: (item: UserChatInteraction) => (
+                <TooltipHost content={`${item.STATE} `}>
+                    <span onClick={() => onStateColumnClick(item)} style={{ cursor: 'pointer' }}>
+                        {item.STATE}
+                    </span>
+                </TooltipHost>
+            ), 
         }
     ]);
+
+    function getStyles(props: ITextFieldStyleProps): Partial<ITextFieldStyles> {
+        return {
+          fieldGroup: [
+            { width: 300 },
+          ]
+        };
+    }
+
+    const DisplayData=value?.CITATIONS.map(
+        (citation)=>{
+            return(
+                <tr>
+                    <td>{citation}</td>
+                </tr>
+            )
+        }
+    )
+
+    async function handleUpdate() {
+        try {
+            const reviewComment = ({
+                id: value?.ID,
+                state: userAccuracyStateChange?.text, 
+                review_comment: userReviewCommentChange 
+              });
+            await logUserReviewComment(reviewComment);
+        } catch (error) {
+            // Handle the error here
+            console.log(error);
+        }
+        setStateDialogVisible(false);
+    }
 
     return (
         <div className={styles.container}>
@@ -250,6 +352,16 @@ export const EvaluateAccuracy = ({ className }: Props) => {
                         styles={dropdownTimespanStyles}
                         aria-label="timespan options for search to be displayed"
                     />
+                <Dropdown
+                        label="Accuracy State:"
+                        defaultSelectedKey={'ALL'}
+                        onChange={onAccuracyStateChange}
+                        placeholder="Select accuracy states"
+                        options={dropdownAccuracyStateOptions}
+                        styles={dropdownTimespanStyles}
+                        aria-label="accuracy state options for accuracy statuses to be displayed"
+                    />
+                <TextField label='User:' styles={getStyles} onChange={onUserChange}/>
             </div>
             {isLoading ? (
                 <animated.div style={{ ...animatedStyles }}>
@@ -286,6 +398,56 @@ export const EvaluateAccuracy = ({ className }: Props) => {
                         />
                         <span className={styles.footer}>{"(" + items.length as string + ") records."}</span>
                     </div>
+                    <Panel
+                        headerText="Status Log"
+                        isOpen={stateDialogVisible}
+                        isBlocking={false}
+                        onDismiss={() => setStateDialogVisible(false)}
+                        closeButtonAriaLabel="Close"
+                        onRenderFooterContent={() => <DefaultButton onClick={() => setStateDialogVisible(false)}>Close</DefaultButton>}
+                        isFooterAtBottom={true}
+                        type={PanelType.medium}
+                    >
+                        <div className={styles.resultspanel}>
+                            <div>
+                                <Label>Prompt</Label><Text>{value?.PROMPT}</Text>
+                                <Label>Response</Label><Text>{value?.RESPONSE}</Text>
+                                <table className="table table-striped">
+                                    <thead>
+                                        <tr>
+                                        <th>Document</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {DisplayData}
+                                    </tbody>
+                                </table>
+                                <Label>State</Label>
+                                <Dropdown
+                                    label="Accuracy State:"
+                                    defaultSelectedKey={value?.STATE}
+                                    onChange={onUserAccuracyStateChange}
+                                    placeholder="Select accuracy states"
+                                    options={dropdownAccuracyStateOptions}
+                                    styles={dropdownTimespanStyles}
+                                    aria-label="accuracy state options for accuracy statuses to be displayed"
+                                />
+                                <Label>Review Comment</Label>
+                                <TextField styles={getStyles} onChange={onUserReviewCommentChange} value={value?.REVIEW_COMMENT}/>
+                                <br /><br />
+                                <button
+                                onClick={handleUpdate}
+                                className={classNames(
+                                    styles.feedback_button,
+                                    ""
+                                )}
+                                aria-label="Update"
+                                >
+                                Update
+                                </button>
+                            </div>
+                        </div>
+                    </Panel>                    
                 </div>
             )}
         </div>

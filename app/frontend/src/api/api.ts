@@ -19,6 +19,7 @@ import { ChatResponse,
     getMaxCSVFileSizeType,
     UserChatInteraction,
     UserFeedback,
+    AccuracyState,
     } from "./models";
 
 export async function chatApi(options: ChatRequest, signal: AbortSignal): Promise<Response> {
@@ -564,14 +565,15 @@ export async function logUserFeedback(user_feedback_data: UserFeedback | undefin
     return results;
 }
 
-export async function getAllUserFeedback(options: {timeframe: number}): Promise<UserFeedback[]> {
+export async function getAllUserFeedback(options: {timeframe: number, user: string}): Promise<UserFeedback[]> {
     const response = await fetch("/getAllUserFeedback", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
         },
         body: JSON.stringify({
-            timeframe: options.timeframe
+            timeframe: options.timeframe,
+            user: options.user
             })
         });
     
@@ -583,21 +585,56 @@ export async function getAllUserFeedback(options: {timeframe: number}): Promise<
     return results;
 }
 
-export async function getAllUserChatInteractions(options: {timeframe: number}): Promise<UserChatInteraction[]> {
+export async function getAllUserChatInteractions(options: {timeframe: number, state: AccuracyState, user: string}): Promise<UserChatInteraction[]> {
     const response = await fetch("/getAllUserChatInteractions", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
         },
         body: JSON.stringify({
-            timeframe: options.timeframe
+            timeframe: options.timeframe,
+            state: options.state,
+            user: options.user
             })
         });
     
-    const parsedResponse: any = await response.json();
+    const resp: any = await response.json();
+    if (response.status > 299 || !response.ok) {
+        throw Error(resp.error || "Unknown error");
+    }
+    const parsedResponse = resp.map((item: { id: any; user: any; prompt: any; response: any; start_time: any; end_time: any; state: any; citations: any[]; }) => ({
+        id: item.id,
+        user: item.user,
+        prompt: item.prompt,
+        response: item.response,
+        start_time: item.start_time,
+        end_time: item.end_time,
+        state: item.state,
+        review_comment: item.end_time,
+        citations: item.citations.map(subItem => subItem.document)
+    }));
+    const results: UserChatInteraction[] = parsedResponse;
+    return results;
+}
+
+export async function logUserReviewComment(review_comment_data: {id: string | undefined, state: string | undefined, review_comment: string | undefined}): Promise<StatusLogResponse> {
+    var response = await fetch("/logUserReviewComment", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            "id": review_comment_data.id,
+            "state": review_comment_data.state,
+            "review_comment": review_comment_data.review_comment,
+            })
+    });
+
+    var parsedResponse: StatusLogResponse = await response.json();
     if (response.status > 299 || !response.ok) {
         throw Error(parsedResponse.error || "Unknown error");
     }
-    const results: UserChatInteraction[] = parsedResponse;
+
+    var results: StatusLogResponse = {status: parsedResponse.status};
     return results;
 }

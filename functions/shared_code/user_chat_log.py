@@ -67,6 +67,8 @@ class UserChatLog:
 
     def read_chat_interactions_by_timeframe(self,
                        within_n_hours: int,
+                       state: State = State.ALL,
+                       user: str = ''
                        ):
         """ 
         Function to issue a query and return resulting chat interactions          
@@ -84,6 +86,12 @@ class UserChatLog:
             from_time_string = str(from_time.strftime('%Y-%m-%d %H:%M:%S'))
             conditions.append(f"c.start_time > '{from_time_string}'")
 
+        if state != State.ALL:
+            conditions.append(f"c.state = '{state.value}'")
+
+        if user != '':
+            conditions.append(f"STARTSWITH(c.user, '{user}')")
+
         if conditions:
             query_string += " WHERE " + " AND ".join(conditions)
 
@@ -95,3 +103,19 @@ class UserChatLog:
         ))
 
         return items
+
+    def review_comment(id, state, review_comment):
+        """ Function to update the review comment for a specified id """
+
+        # add to standard logger
+        logging.info("%s Start - %s", id, state)
+
+        try:
+            json_document = self.container.read_item(item=id)
+            json_document['state'] = state
+            json_document['review_comment'] = review_comment
+            self.container.replace_time(item=json_document, body=json_document)
+
+        except Exception as err:
+            # log the exception with stack trace to the status log
+            logging.error("Unexpected exception upserting document %s", str(err))

@@ -185,7 +185,7 @@ export const FeedbackContent = ({ className, whoAmIData, onUserFeedback }: Props
             <button
               onClick={handleFeedback}
               className={classNames(
-                styles.upload_button,
+                styles.feedback_button,
                 ""
               )}
               aria-label="Submit Feedback"

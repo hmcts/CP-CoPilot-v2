@@ -72,15 +72,15 @@ class ChatReadRetrieveReadApproach(Approach):
     QUERY_PROMPT_FEW_SHOTS = [
         {'role' : Approach.USER, 'content' : 'What are the future plans for public transportation development?' },
         {'role' : Approach.ASSISTANT, 'content' : 'Future plans for public transportation' },
-        {'role' : Approach.USER, 'content' : 'how much renewable energy was generated last year?' },
-        {'role' : Approach.ASSISTANT, 'content' : 'Renewable energy generation last year' }
+        #{'role' : Approach.USER, 'content' : 'how much renewable energy was generated last year?' },
+        #{'role' : Approach.ASSISTANT, 'content' : 'Renewable energy generation last year' }
     ]
 
     RESPONSE_PROMPT_FEW_SHOTS = [
         {"role": Approach.USER ,'content': 'I am looking for information in source documents'},
         {'role': Approach.ASSISTANT, 'content': 'user is looking for information in source documents. Do not provide answers that are not in the source documents'},
-        {'role': Approach.USER, 'content': 'What steps are being taken to promote energy conservation?'},
-        {'role': Approach.ASSISTANT, 'content': 'Several steps are being taken to promote energy conservation including reducing energy consumption, increasing energy efficiency, and increasing the use of renewable energy sources.Citations[File0]'}
+        #{'role': Approach.USER, 'content': 'What steps are being taken to promote energy conservation?'},
+        #{'role': Approach.ASSISTANT, 'content': 'Several steps are being taken to promote energy conservation including reducing energy consumption, increasing energy efficiency, and increasing the use of renewable energy sources.Citations[File0]'}
     ]
     
     

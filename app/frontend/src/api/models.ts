@@ -235,6 +235,7 @@ export const enum AccuracyState {
 }
 
 export type UserChatInteraction = {
+    ID?: string;
     USER_ID?: string;
     PROMPT: string;
     RESPONSE?: string;

@@ -57,6 +57,7 @@ class UserFeedbackLog:
 
     def read_feedback_by_timeframe(self,
                        within_n_hours: int,
+                       user: str = ''
                        ):
         """ 
         Function to issue a query and return resulting feedback          
@@ -73,6 +74,9 @@ class UserFeedbackLog:
             from_time = datetime.utcnow() - timedelta(hours=within_n_hours)
             from_time_string = str(from_time.strftime('%Y-%m-%d %H:%M:%S'))
             conditions.append(f"c.timestamp > '{from_time_string}'")
+        
+        if user != '':
+            conditions.append(f"STARTSWITH(c.user, '{user}')")
 
         if conditions:
             query_string += " WHERE " + " AND ".join(conditions)
