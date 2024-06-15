@@ -310,7 +310,7 @@ export const EvaluateAccuracy = ({ className }: Props) => {
     function getStyles(props: ITextFieldStyleProps): Partial<ITextFieldStyles> {
         return {
           fieldGroup: [
-            { width: 300 },
+            { width: 500 },
           ]
         };
     }
@@ -324,6 +324,14 @@ export const EvaluateAccuracy = ({ className }: Props) => {
             )
         }
     )
+
+    function replacLineBreaks(response: string) {
+        if(response) {
+            return response.split('\n').join('<br />')
+        } else {
+            return response;
+        }
+    }
 
     async function handleUpdate() {
         try {
@@ -411,7 +419,7 @@ export const EvaluateAccuracy = ({ className }: Props) => {
                         <div className={styles.resultspanel}>
                             <div>
                                 <Label>Prompt</Label><Text>{value?.prompt}</Text>
-                                <Label>Response</Label><Text>{value?.response}</Text>
+                                <Label>Response</Label><pre>{replacLineBreaks(value?.response)}</pre>
                                 <table className="table table-striped">
                                     <thead>
                                         <tr>
@@ -432,7 +440,7 @@ export const EvaluateAccuracy = ({ className }: Props) => {
                                     styles={dropdownTimespanStyles}
                                     aria-label="accuracy state options for accuracy statuses to be displayed"
                                 />
-                                <TextField label='Review Comment:' styles={getStyles} onChange={onUserReviewCommentChange}/>
+                                <TextField label='Review Comment:' multiline resizable={true} value={value?.review_comment} styles={getStyles} onChange={onUserReviewCommentChange}/>
                                 <br /><br />
                                 <button
                                 onClick={handleUpdate}

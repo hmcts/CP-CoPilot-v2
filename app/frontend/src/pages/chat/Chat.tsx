@@ -517,7 +517,7 @@ const Chat = () => {
                         )}
                         <QuestionInput
                             clearOnSend
-                            placeholder="Type a new question (e.g. How do I discontinue a case?)"
+                            placeholder="Type a new question (e.g. I am unable to download or print a court list where an application is listed in that courtroom, what should I do?)"
                             disabled={isLoading}
                             onSend={question => makeApiRequest(question, defaultApproach, {}, {}, {})}
                             onAdjustClick={() => setIsConfigPanelOpen(!isConfigPanelOpen)}

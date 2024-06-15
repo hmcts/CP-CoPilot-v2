@@ -11,9 +11,9 @@ export type ExampleModel = {
 };
 
 const EXAMPLES: ExampleModel[] = [
-    { text: "How do I result breach of bail?", value: "How do I result breach of bail?" },
-    { text: "How do I result a bail appeal?", value: "How do I result a bail appeal?" },
-    { text: "How do I amend my result as I made an error?", value: "How do I amend my result as I made an error?" }
+    { text: "What is the process to allocate a hearing from the unallocated hearing list", value: "What is the process to allocate a hearing from the unallocated hearing list" },
+    { text: "What code do I use for a case involving murder and sent to the Crown court for bail", value: "What code do I use for a case involving murder and sent to the Crown court for bail" },
+    { text: "What is the offence code for Application to review Bail decision", value: "What is the offence code for Application to review Bail decision" }
 ];
 
 interface Props {
