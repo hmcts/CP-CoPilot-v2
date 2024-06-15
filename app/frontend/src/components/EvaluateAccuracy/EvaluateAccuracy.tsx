@@ -419,7 +419,7 @@ export const EvaluateAccuracy = ({ className }: Props) => {
                         <div className={styles.resultspanel}>
                             <div>
                                 <Label>Prompt</Label><Text>{value?.prompt}</Text>
-                                <Label>Response</Label><pre>{replacLineBreaks(value?.response)}</pre>
+                                <Label>Response</Label><Text style={{whiteSpace: "pre-line"}}>{replacLineBreaks(value?.response)}</Text>
                                 <table className="table table-striped">
                                     <thead>
                                         <tr>
