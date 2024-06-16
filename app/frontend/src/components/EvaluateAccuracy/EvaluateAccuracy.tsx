@@ -74,7 +74,7 @@ export const EvaluateAccuracy = ({ className }: Props) => {
         setValue(item);
     };
 
-    const onStateColumnClick = (item: UserChatInteraction) => {
+    const onStateColumnClick = (item: any) => {
         try {
             refreshProp(item);
             setStateDialogVisible(true);
@@ -325,14 +325,6 @@ export const EvaluateAccuracy = ({ className }: Props) => {
         }
     )
 
-    function replacLineBreaks(response: string) {
-        if(response) {
-            return response.split('\n').join('<br />')
-        } else {
-            return response;
-        }
-    }
-
     async function handleUpdate() {
         try {
             const reviewComment = ({
@@ -419,7 +411,7 @@ export const EvaluateAccuracy = ({ className }: Props) => {
                         <div className={styles.resultspanel}>
                             <div>
                                 <Label>Prompt</Label><Text>{value?.prompt}</Text>
-                                <Label>Response</Label><Text style={{whiteSpace: "pre-line"}}>{replacLineBreaks(value?.response)}</Text>
+                                <Label>Response</Label><Text>{value?.response}</Text> 
                                 <table className="table table-striped">
                                     <thead>
                                         <tr>
