@@ -103,7 +103,7 @@ const Chat = () => {
 
             setWhoAmIData({USER_NAME: user_name, USER_ROLES: user_roles, USER_ID: user_id});
 
-            logEvent(user_id, "access", "Chat");
+            //logEvent(user_id, "access", "Chat");
 
         } catch (error) {
             // Handle the error here

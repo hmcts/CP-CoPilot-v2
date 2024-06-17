@@ -325,6 +325,14 @@ export const EvaluateAccuracy = ({ className }: Props) => {
         }
     )
 
+    const ResponseData=value?.response.split('\n').map(
+        (result : any)=>{
+            return(
+                <div>{result}</div>
+            )
+        }
+    )
+
     async function handleUpdate() {
         try {
             const reviewComment = ({
@@ -411,7 +419,7 @@ export const EvaluateAccuracy = ({ className }: Props) => {
                         <div className={styles.resultspanel}>
                             <div>
                                 <Label>Prompt</Label><Text>{value?.prompt}</Text>
-                                <Label>Response</Label><Text>{value?.response}</Text> 
+                                <Label>Response</Label><Text>{ResponseData}</Text> 
                                 <table className="table table-striped">
                                     <thead>
                                         <tr>
@@ -432,7 +440,7 @@ export const EvaluateAccuracy = ({ className }: Props) => {
                                     styles={dropdownTimespanStyles}
                                     aria-label="accuracy state options for accuracy statuses to be displayed"
                                 />
-                                <TextField label='Review Comment:' multiline resizable={true} value={value?.review_comment} styles={getStyles} onChange={onUserReviewCommentChange}/>
+                                <TextField label='Review Comment:' multiline resizable={true} defaultValue={value?.review_comment} styles={getStyles} onChange={onUserReviewCommentChange}/>
                                 <br /><br />
                                 <button
                                 onClick={handleUpdate}
