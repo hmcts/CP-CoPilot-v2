@@ -565,7 +565,7 @@ export async function logUserFeedback(user_feedback_data: UserFeedback | undefin
     return results;
 }
 
-export async function getAllUserFeedback(options: {timeframe: number, user: string}): Promise<UserFeedback[]> {
+export async function getAllUserFeedback(options: {timeframe: number, user: string, number_of_records: number, exclude_project_team: number}): Promise<UserFeedback[]> {
     const response = await fetch("/getAllUserFeedback", {
         method: "POST",
         headers: {
@@ -573,7 +573,9 @@ export async function getAllUserFeedback(options: {timeframe: number, user: stri
         },
         body: JSON.stringify({
             timeframe: options.timeframe,
-            user: options.user
+            user: options.user,
+            num_of_records: options.number_of_records,
+            exclude_project_team: options.exclude_project_team
             })
         });
     
@@ -585,7 +587,7 @@ export async function getAllUserFeedback(options: {timeframe: number, user: stri
     return results;
 }
 
-export async function getAllUserChatInteractions(options: {timeframe: number, state: string, user: string}): Promise<UserChatInteraction[]> {
+export async function getAllUserChatInteractions(options: {timeframe: number, state: string, user: string, number_of_records: number, exclude_project_team: number}): Promise<UserChatInteraction[]> {
     const response = await fetch("/getAllUserChatInteractions", {
         method: "POST",
         headers: {
@@ -594,7 +596,9 @@ export async function getAllUserChatInteractions(options: {timeframe: number, st
         body: JSON.stringify({
             timeframe: options.timeframe,
             state: options.state,
-            user: options.user
+            user: options.user,
+            num_of_records: options.number_of_records,
+            exclude_project_team: options.exclude_project_team
             })
         });
     

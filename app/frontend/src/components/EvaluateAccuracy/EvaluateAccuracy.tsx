@@ -34,6 +34,21 @@ const dropdownTimespanOptions = [
     { key: AccuracyState.PARTIAL, text: 'Partial' },
   ];
 
+  const dropdownRowNumberOptions = [
+    { key: 'Number of Rows', text: 'Number of Rows', itemType: DropdownMenuItemType.Header },
+    { key: '25', text: '25' },
+    { key: '50', text: '50' },
+    { key: '75', text: '75' },
+    { key: '100', text: '100' },
+    { key: '5000', text: 'All' },
+  ];
+  
+const dropdownProjectTeamOptions = [
+    { key: 'Project Team', text: 'Project Team', itemType: DropdownMenuItemType.Header },
+    { key: '1', text: 'Exclude' },
+    { key: '0', text: 'Include' },
+  ];
+
 interface Props {
     className?: string;
 }
@@ -46,6 +61,8 @@ export const EvaluateAccuracy = ({ className }: Props) => {
     const [stateDialogVisible, setStateDialogVisible] = useState(false);
     const [userAccuracyStateChange, setUserAccuracyStateChange] = useState<IDropdownOption>();
     const [userReviewCommentChange, setUserReviewCommentChange] = useState<string>('');
+    const [selectedNumberOfRecordsItem, setSelectedNumberOfRecordsItem] = useState<number>(25);
+    const [selectedProjectTeamItem, setSelectedProjectTeamItem] = useState<number>(1);
 
     const [files, setFiles] = useState<UserChatInteraction[]>();
     const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -64,6 +81,14 @@ export const EvaluateAccuracy = ({ className }: Props) => {
 
     const onUserChange = (_ev?: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string) => {
         setSelectedUser(newValue || "");
+    };
+
+    const onNumberOfRecordsChange = (event: React.FormEvent<HTMLDivElement>, item: IDropdownOption<any> | undefined): void => {
+        setSelectedNumberOfRecordsItem(parseInt(item?.key as string));
+    };
+
+    const onProjectTeamChange = (event: React.FormEvent<HTMLDivElement>, item: IDropdownOption<any> | undefined): void => {
+        setSelectedProjectTeamItem(parseInt(item?.key as string));
     };
 
     const onUserReviewCommentChange = (_ev?: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string) => {
@@ -161,7 +186,9 @@ export const EvaluateAccuracy = ({ className }: Props) => {
         const req = {
             timeframe: timeframe,
             state: selectedAccuracyStateItem?.key == undefined ? "All" : selectedAccuracyStateItem?.key as string,
-            user: selectedUser
+            user: selectedUser,
+            number_of_records: selectedNumberOfRecordsItem,
+            exclude_project_team: selectedProjectTeamItem
         }
         const response = await getAllUserChatInteractions(req);
         setIsLoading(false);
@@ -370,6 +397,24 @@ export const EvaluateAccuracy = ({ className }: Props) => {
                         aria-label="accuracy state options for accuracy statuses to be displayed"
                     />
                 <TextField label='User:' styles={getStyles} onChange={onUserChange}/>
+                <Dropdown
+                        label="Number of Records:"
+                        defaultSelectedKey='25'
+                        onChange={onNumberOfRecordsChange}
+                        placeholder="Select number of records"
+                        options={dropdownRowNumberOptions}
+                        styles={dropdownTimespanStyles}
+                        aria-label="number of records options"
+                    />
+                <Dropdown
+                        label="Project Team:"
+                        defaultSelectedKey='1'
+                        onChange={onProjectTeamChange}
+                        placeholder="Include / Exclude Project Team"
+                        options={dropdownProjectTeamOptions}
+                        styles={dropdownTimespanStyles}
+                        aria-label="include / exclude project team options"
+                    />
             </div>
             {isLoading ? (
                 <animated.div style={{ ...animatedStyles }}>

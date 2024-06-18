@@ -11,12 +11,13 @@ import traceback, sys
 class UserFeedbackLog:
     """ Class for logging User Feedback to Cosmos DB"""
 
-    def __init__(self, url, key, database_name, container_name):
+    def __init__(self, url, key, database_name, container_name, project_team_filter):
         """ Constructor function """
         self._url = url
         self._key = key
         self._database_name = database_name
         self._container_name = container_name
+        self._project_team_filter = project_team_filter
         self.cosmos_client = CosmosClient(url=self._url, credential=self._key)
 
         # Select a database (will create it if it doesn't exist)
@@ -57,7 +58,9 @@ class UserFeedbackLog:
 
     def read_feedback_by_timeframe(self,
                        within_n_hours: int,
-                       user: str = ''
+                       user: str = '',
+                       num_of_records: int = 25,
+                       exclude_project_team: int = 1
                        ):
         """ 
         Function to issue a query and return resulting feedback          
@@ -65,11 +68,15 @@ class UserFeedbackLog:
             within_n_hours - integer representing from how many minutes ago to return docs for
         """
 
-        query_string = "SELECT c.id,  c.user, c.timestamp, \
+        query_string = "SELECT TOP " + str(num_of_records) + " c.id,  c.user, c.timestamp, \
             c.accuracy, c.ease_of_use, c.response_time, c.helpful, \
             c.reusability FROM c"
 
-        conditions = []    
+        conditions = []
+
+        if exclude_project_team == 1:
+            conditions.append(self._project_team_filter)
+            
         if within_n_hours != -1:
             from_time = datetime.utcnow() - timedelta(hours=within_n_hours)
             from_time_string = str(from_time.strftime('%Y-%m-%d %H:%M:%S'))

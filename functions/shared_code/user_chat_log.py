@@ -20,12 +20,13 @@ class AccuracyState(Enum):
 class UserChatLog:
     """ Class for logging User Chats to Cosmos DB"""
 
-    def __init__(self, url, key, database_name, container_name):
+    def __init__(self, url, key, database_name, container_name, project_team_filter):
         """ Constructor function """
         self._url = url
         self._key = key
         self._database_name = database_name
         self._container_name = container_name
+        self._project_team_filter = project_team_filter
         self.cosmos_client = CosmosClient(url=self._url, credential=self._key)
 
         # Select a database (will create it if it doesn't exist)
@@ -42,7 +43,7 @@ class UserChatLog:
 
     def upsert_document(self, user, prompt, start_time, response, citations, end_time):
         """ Function to upsert a user chat interaction for a specified id """
-
+        
         # add to standard logger
         logging.info("%s Start - %s", user, start_time)
 
@@ -70,7 +71,9 @@ class UserChatLog:
     def read_chat_interactions_by_timeframe(self,
                        within_n_hours: int,
                        state: str = 'All',
-                       user: str = ''
+                       user: str = '',
+                       num_of_records: int = 25,
+                       exclude_project_team: int = 1
                        ):
         """ 
         Function to issue a query and return resulting chat interactions          
@@ -78,13 +81,16 @@ class UserChatLog:
             within_n_hours - integer representing from how many minutes ago to return docs for
         """
 
-        query_string = "SELECT c.id,  c.user, c.prompt, \
+        query_string = "SELECT TOP " + str(num_of_records) + " c.id,  c.user, c.prompt, \
             c.response, c.start_time, c.end_time, c.citations, \
             c.state, c.review_comment, c.type FROM c"
 
         conditions = []
 
         conditions.append("c.type = 'chat'")
+
+        if exclude_project_team == 1:
+            conditions.append(self._project_team_filter)
 
         if within_n_hours != -1:
             from_time = datetime.utcnow() - timedelta(hours=within_n_hours)

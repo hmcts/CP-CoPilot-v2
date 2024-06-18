@@ -108,7 +108,8 @@ ENV = {
     "ENABLE_MATH_ASSISTANT": "false",
     "ENABLE_TABULAR_DATA_ASSISTANT": "false",
     "ENABLE_MULTIMEDIA": "false",
-    "MAX_CSV_FILE_SIZE": "7"
+    "MAX_CSV_FILE_SIZE": "7",
+    "PROJECT_TEAM_FILTER": None
     }
 
 for key, value in ENV.items():
@@ -156,7 +157,8 @@ userChatLog = UserChatLog(
     ENV["COSMOSDB_URL"],
     ENV["COSMOSDB_KEY"],
     ENV["COSMOSDB_USAGE_DATABASE_NAME"],
-    ENV["COSMOSDB_USERCHAT_CONTAINER_NAME"]
+    ENV["COSMOSDB_USERCHAT_CONTAINER_NAME"],
+    ENV["PROJECT_TEAM_FILTER"]
 )
 
 # Setup UserChatLog to allow access to CosmosDB for logging
@@ -164,7 +166,8 @@ userFeedbackLog = UserFeedbackLog(
     ENV["COSMOSDB_URL"],
     ENV["COSMOSDB_KEY"],
     ENV["COSMOSDB_USAGE_DATABASE_NAME"],
-    ENV["COSMOSDB_USERFEEDBACK_CONTAINER_NAME"]
+    ENV["COSMOSDB_USERFEEDBACK_CONTAINER_NAME"],
+    ENV["PROJECT_TEAM_FILTER"]
 )
 
 azure_search_key_credential = AzureKeyCredential(ENV["AZURE_SEARCH_SERVICE_KEY"])
@@ -942,8 +945,10 @@ async def getAllUserFeedback(request: Request):
     json_body = await request.json()
     timeframe = json_body.get("timeframe")
     user = json_body.get("user")
+    num_of_records = json_body.get("num_of_records")
+    exclude_project_team = json_body.get("exclude_project_team")
     try:
-        results = userFeedbackLog.read_feedback_by_timeframe(timeframe, user)
+        results = userFeedbackLog.read_feedback_by_timeframe(timeframe, user, num_of_records, exclude_project_team)
 
     except Exception as ex:
         log.exception("Exception in /getAllUserFeedback")
@@ -965,8 +970,10 @@ async def getAllUserChatInteractions(request: Request):
     timeframe = json_body.get("timeframe")
     state = json_body.get("state")
     user = json_body.get("user")
+    num_of_records = json_body.get("num_of_records")
+    exclude_project_team = json_body.get("exclude_project_team")
     try:
-        results = userChatLog.read_chat_interactions_by_timeframe(timeframe, state, user)
+        results = userChatLog.read_chat_interactions_by_timeframe(timeframe, state, user, num_of_records, exclude_project_team)
 
     except Exception as ex:
         log.exception("Exception in /getAllUserChatInteractions")

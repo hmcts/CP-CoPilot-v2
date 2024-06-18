@@ -24,6 +24,22 @@ const dropdownTimespanOptions = [
     { key: '-1days', text: 'All' },
   ];
 
+const dropdownRowNumberOptions = [
+    { key: 'Number of Rows', text: 'Number of Rows', itemType: DropdownMenuItemType.Header },
+    { key: '25', text: '25' },
+    { key: '50', text: '50' },
+    { key: '75', text: '75' },
+    { key: '100', text: '100' },
+    { key: '5000', text: 'All' },
+  ];
+
+  
+const dropdownProjectTeamOptions = [
+    { key: 'Project Team', text: 'Project Team', itemType: DropdownMenuItemType.Header },
+    { key: '1', text: 'Exclude' },
+    { key: '0', text: 'Include' },
+  ];
+
 interface Props {
     className?: string;
 }
@@ -31,6 +47,8 @@ interface Props {
 export const EvaluateFeedback = ({ className }: Props) => {
     const [selectedTimeFrameItem, setSelectedTimeFrameItem] = useState<IDropdownOption>();
     const [selectedUser, setSelectedUser] = useState<string>('');
+    const [selectedNumberOfRecordsItem, setSelectedNumberOfRecordsItem] = useState<number>(25);
+    const [selectedProjectTeamItem, setSelectedProjectTeamItem] = useState<number>(1);
 
 
     const [files, setFiles] = useState<UserFeedback[]>();
@@ -42,6 +60,14 @@ export const EvaluateFeedback = ({ className }: Props) => {
 
     const onUserChange = (_ev?: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string) => {
         setSelectedUser(newValue || "");
+    };
+
+    const onNumberOfRecordsChange = (event: React.FormEvent<HTMLDivElement>, item: IDropdownOption<any> | undefined): void => {
+        setSelectedNumberOfRecordsItem(parseInt(item?.key as string));
+    };
+
+    const onProjectTeamChange = (event: React.FormEvent<HTMLDivElement>, item: IDropdownOption<any> | undefined): void => {
+        setSelectedProjectTeamItem(parseInt(item?.key as string));
     };
 
     const onColumnClick = (ev: React.MouseEvent<HTMLElement>, column: IColumn): void => {
@@ -120,7 +146,9 @@ export const EvaluateFeedback = ({ className }: Props) => {
 
         const req = {
             timeframe: timeframe,
-            user: selectedUser
+            user: selectedUser,
+            number_of_records: selectedNumberOfRecordsItem,
+            exclude_project_team: selectedProjectTeamItem
         }
         const response = await getAllUserFeedback(req);
         setIsLoading(false);
@@ -275,6 +303,24 @@ export const EvaluateFeedback = ({ className }: Props) => {
                         aria-label="timespan options for feedback to be displayed"
                     />
                 <TextField label='User:' styles={getStyles} onChange={onUserChange}/>
+                <Dropdown
+                        label="Number of Records:"
+                        defaultSelectedKey='25'
+                        onChange={onNumberOfRecordsChange}
+                        placeholder="Select number of records"
+                        options={dropdownRowNumberOptions}
+                        styles={dropdownTimespanStyles}
+                        aria-label="number of records options"
+                    />
+                <Dropdown
+                        label="Project Team:"
+                        defaultSelectedKey='1'
+                        onChange={onProjectTeamChange}
+                        placeholder="Include / Exclude Project Team"
+                        options={dropdownProjectTeamOptions}
+                        styles={dropdownTimespanStyles}
+                        aria-label="include / exclude project team options"
+                    />
             </div>
             {isLoading ? (
                 <animated.div style={{ ...animatedStyles }}>
