@@ -137,5 +137,5 @@ def process_agent_response(question):
     pdagent = create_pandas_dataframe_agent(chat, dffinal, verbose=True,handle_parsing_errors=True,agent_type=AgentType.OPENAI_FUNCTIONS)
     for chunk in pdagent.stream({"input": question}):
         if "output" in chunk:
-            output = f'Final Output: ```{chunk["output"]}```'
+            output = f'{chunk["output"]}'
             return output

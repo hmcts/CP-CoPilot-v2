@@ -41,6 +41,7 @@ const Tda = ({folderPath, tags}: Props) => {
   const [images, setImages] = useState<string[]>([]);
   const eventSourceRef = useRef<EventSource | null>(null);
   const [maxCSVFileSize, setMaxCSVFileSize] = useState<getMaxCSVFileSizeType | null>(null);
+  const [abortController, setAbortController] = useState<AbortController | undefined>(undefined);
 
 
   type ExampleModel = {
@@ -49,10 +50,9 @@ const Tda = ({folderPath, tags}: Props) => {
 };
 
 const EXAMPLES: ExampleModel[] = [
-    { text: "How many rows are there?", value: "How many rows are there?" },
-    { text: "What are the data types of each column?", value: "What are the data types of each column?" },
-    { text: "Are there any missing values in the dataset?", value: "Are there any missing values in the dataset?" },
-    { text: "What are the summary statistics for categorical data?", value: "What are the summary statistics for categorical data?" }
+  { text: "What is the Offence Code for Offence Title \"Assault by beating\"", value: "What is the Offence Code for Offence Title \"Assault by beating\"" },
+  { text: "List 7 Offence Codes and Offence Titles related to Legislation \"Theft Act 1968.\"", value: "List 7 Offence Codes and Offence Titles related to Legislation \"Theft Act 1968.\"" },
+  { text: "Show me the DVLA Code for \"Use a motor vehicle on a road / public place without third party insurance\"", value: "Show me the DVLA Code for \"Use a motor vehicle on a road / public place without third party insurance\"" }
 ];
 
 interface Props {
@@ -111,16 +111,20 @@ const fetchImages = async () => {
         const query = setOtherQ(selectedQuery);
         setOutput('');
         setRenderAnswer(true);
-        if (fileu) {
-          const result = await processCsvAgentResponse(query, fileu);
-          setOutput(result.toString());
-          fetchImages();
-          return;
+        //if (fileu) {
+        //const result = await processCsvAgentResponse(query, fileu);
+        const controller = new AbortController();
+        setAbortController(controller);
+        const signal = controller.signal;
+        const result = await processCsvAgentResponse(query, new File([], ""), 3, signal);
+        setOutput(result.toString());
+        fetchImages();
+        return;
 
-        }
-        else {
-          setOutput("no file file has been uploaded.")
-        }
+        //}
+        //else {
+        //  setOutput("no file file has been uploaded.")
+        //}
       } catch (error) {
         lastError = error;
       }
@@ -306,12 +310,8 @@ const handleCloseEvent = () => {
     <div className={cstyle.App} >
     <TableSearchFilled fontSize={"6rem"} primaryFill={"#7719aa"} aria-hidden="true" aria-label="Supported File Types" />
     <h1 className={cstyle.EmptyStateTitle}>
-      Tabular Data Assistant
+      Welcome to Knowledge Genie Tabular Data Assistant
     </h1>
-    <span className={styles.chatEmptyObjectives}>
-      <i className={cstyle.centertext}>Information Assistant uses AI. Check for mistakes.</i> <a href="https://github.com/microsoft/PubSec-Info-Assistant/blob/main/docs/transparency.md" target="_blank" rel="noopener noreferrer"> Transparency Note</a>
-    </span>
-    
     
     <div className={cstyle.centeredContainer}>
     <h2 className={styles.EmptyStateTitle}>Supported file types</h2>

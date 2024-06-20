@@ -4,7 +4,8 @@
 export const enum ChatMode {
     WorkOnly = 0,
     WorkPlusWeb = 1,
-    Ungrounded = 2
+    Ungrounded = 2,
+    TabularDataAssistant = 3
 }
 
 export const enum Approaches {
@@ -14,7 +15,8 @@ export const enum Approaches {
     GPTDirect = 3,
     ChatWebRetrieveRead = 4,
     CompareWorkWithWeb = 5,
-    CompareWebWithWork = 6
+    CompareWebWithWork = 6,
+    TabularDataAssistant = 7
 }
 
 export type ChatRequestOverrides = {
@@ -231,7 +233,9 @@ export const enum AccuracyState {
     CORRECT = "Correct",
     INCORRECT = "Incorrect",
     PARTIAL = "Partial",
-    ALL = "All"
+    ALL = "All",
+    INVALID = "Invalid Question",
+    UNAVAILABLE = "Unavailable Data"
 }
 
 export type UserChatInteraction = {

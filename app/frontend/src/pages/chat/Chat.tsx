@@ -2,16 +2,16 @@
 // Licensed under the MIT license.
 
 import { useRef, useState, useEffect } from "react";
-import { Checkbox, Panel, DefaultButton, TextField, SpinButton, Separator, Toggle, Label, IconButton, Text } from "@fluentui/react";
+import { Checkbox, Panel, DefaultButton, TextField, SpinButton, Separator, Toggle, Label, IconButton, Text, Stack } from "@fluentui/react";
 import Switch from 'react-switch';
-import { GlobeFilled, BuildingMultipleFilled, AddFilled, ChatSparkleFilled } from "@fluentui/react-icons";
+import { GlobeFilled, BuildingMultipleFilled, AddFilled, ChatSparkleFilled, BuildingGovernmentFilled, ShieldCheckmark20Regular } from "@fluentui/react-icons";
 import { ITag } from '@fluentui/react/lib/Pickers';
 
 import styles from "./Chat.module.css";
 import rlbgstyles from "../../components/ResponseLengthButtonGroup/ResponseLengthButtonGroup.module.css";
 import rtbgstyles from "../../components/ResponseTempButtonGroup/ResponseTempButtonGroup.module.css";
 
-import { chatApi, Approaches, ChatResponse, ChatRequest, ChatTurn, ChatMode, getFeatureFlags, GetFeatureFlagsResponse, GetWhoAmIResponse, UserChatInteraction, logUserChatInteraction, UserFeedback, logUserFeedback, logUserEvent } from "../../api";
+import { chatApi, Approaches, ChatResponse, ChatRequest, ChatTurn, ChatMode, getFeatureFlags, GetFeatureFlagsResponse, GetWhoAmIResponse, UserChatInteraction, logUserChatInteraction, UserFeedback, logUserFeedback, logUserEvent, processCsvAgentResponse } from "../../api";
 import { Answer, AnswerError, AnswerLoading } from "../../components/Answer";
 import { QuestionInput } from "../../components/QuestionInput";
 import { ExampleList } from "../../components/Example";
@@ -29,6 +29,9 @@ import { FolderPicker } from "../../components/FolderPicker";
 import { TagPickerInline } from "../../components/TagPicker";
 import React from "react";
 import { FeedbackButton } from "../../components/FeedbackButton";
+import CharacterStreamer from "../../components/CharacterStreamer/CharacterStreamer";
+import { AnswerIcon } from "../../components/Answer/AnswerIcon";
+import ReactMarkdown from "react-markdown";
 
 const Chat = () => {
     const [isConfigPanelOpen, setIsConfigPanelOpen] = useState(false);
@@ -76,6 +79,8 @@ const Chat = () => {
     const [answerStream, setAnswerStream] = useState<ReadableStream | undefined>(undefined);
     const [abortController, setAbortController] = useState<AbortController | undefined>(undefined);
 
+    const [tdaAnswer, setTdaAnswer] = useState('');
+    
     async function fetchFeatureFlags() {
         try {
             const fetchedFeatureFlags = await getFeatureFlags();
@@ -137,6 +142,35 @@ const Chat = () => {
         } catch (error) {
             // Handle the error here
             console.log(error);
+        }
+    }
+
+    const makeTdaApiRequest = async(question: string, approach: Approaches) => {
+        lastQuestionRef.current = question;
+        setActiveApproach(approach);
+
+        error && setError(undefined);
+        setIsLoading(true);
+        setActiveCitation(undefined);
+        setActiveAnalysisPanelTab(undefined);
+
+        const start_timestamp = new Date().toISOString();
+
+        try {
+            const controller = new AbortController();
+            setAbortController(controller);
+            const signal = controller.signal;
+
+            const result = await processCsvAgentResponse(question, new File([], ""), 3, signal);
+            setTdaAnswer(result.toString());
+            const end_timestamp = new Date().toISOString();
+            const userChatInteraction: UserChatInteraction = ({USER_ID: whoAmIData?.USER_ID, PROMPT: question, START_TIMESTAMP: start_timestamp, END_TIMESTAMP: end_timestamp, RESPONSE: result.toString(), CITATIONS: ["CJS/cjs-offence-index-march-2024.csv//cjs-offence-index-march-2024.csv"]})
+            setUserChatInteraction(userChatInteraction);
+            logUserChatInteraction(userChatInteraction);
+        } catch (e) {
+            setError(e);
+        } finally {
+            setIsLoading(false);
         }
     }
 
@@ -223,6 +257,7 @@ const Chat = () => {
         setActiveCitation(undefined);
         setActiveAnalysisPanelTab(undefined);
         setAnswers([]);
+        setTdaAnswer('');
     };
 
     const onResponseLengthChange = (_ev: any) => {
@@ -317,6 +352,9 @@ const Chat = () => {
         if (chatMode == ChatMode.Ungrounded)
             setDefaultApproach(Approaches.GPTDirect)
             setActiveApproach(Approaches.GPTDirect);
+        if (chatMode == ChatMode.TabularDataAssistant)
+            setDefaultApproach(Approaches.TabularDataAssistant);
+            setActiveApproach(Approaches.TabularDataAssistant);
         clearChat();
     }
 
@@ -345,7 +383,11 @@ const Chat = () => {
     };
 
     const onExampleClicked = (example: string) => {
-        makeApiRequest(example, defaultApproach, {}, {}, {});
+        if(defaultApproach == Approaches.TabularDataAssistant) {
+            makeTdaApiRequest(example, defaultApproach);
+        } else {
+            makeApiRequest(example, defaultApproach, {}, {}, {});
+        }
     };
 
     const onShowCitation = (citation: string, citationSourceFile: string, citationSourceFilePageNumber: string, index: number) => {
@@ -406,7 +448,7 @@ const Chat = () => {
     return (
         <div className={styles.container}>
             <div className={styles.subHeader}>
-                <ChatModeButtonGroup className="" defaultValue={activeChatMode} onClick={onChatModeChange} featureFlags={featureFlags} /> 
+                <ChatModeButtonGroup className="" defaultValue={activeChatMode} onClick={onChatModeChange} featureFlags={featureFlags} whoAmIData={whoAmIData} /> 
                 <div className={styles.commandsContainer}>
                     <ClearChatButton className={styles.commandButton} onClick={clearChat} disabled={!lastQuestionRef.current || isLoading} />
                     {whoAmIData?.USER_ROLES == "Admin" &&
@@ -427,7 +469,7 @@ const Chat = () => {
                                     <div className={styles.chatEmptyStateHeader}> 
                                         <BuildingMultipleFilled fontSize={"100px"} primaryFill={"rgba(27, 74, 239, 1)"} aria-hidden="true" aria-label="Chat with your Work Data logo" />
                                         </div>
-                                    <h1 className={styles.chatEmptyStateTitle}>Welcome to Common Platform Knowledge Genie</h1>
+                                    <h1 className={styles.chatEmptyStateTitle}>Welcome to Common Platform Knowledge Genie (Guidance)</h1>
                                 </div>
                             : activeChatMode == ChatMode.WorkPlusWeb ?
                                 <div>
@@ -435,6 +477,13 @@ const Chat = () => {
                                         <BuildingMultipleFilled fontSize={"80px"} primaryFill={"rgba(27, 74, 239, 1)"} aria-hidden="true" aria-label="Chat with your Work and Web Data logo" /><AddFilled fontSize={"50px"} primaryFill={"rgba(0, 0, 0, 0.7)"} aria-hidden="true" aria-label=""/><GlobeFilled fontSize={"80px"} primaryFill={"rgba(24, 141, 69, 1)"} aria-hidden="true" aria-label="" />
                                     </div>
                                     <h1 className={styles.chatEmptyStateTitle}>Chat with your work and web data</h1>
+                                </div>
+                            : activeChatMode == ChatMode.TabularDataAssistant ?
+                                <div>
+                                    <div className={styles.chatEmptyStateHeader}> 
+                                        <BuildingGovernmentFilled fontSize={"100px"} primaryFill={"rgba(27, 74, 239, 1)"} aria-hidden="true" aria-label="Chat with your Work Data logo" />
+                                    </div>
+                                    <h1 className={styles.chatEmptyStateTitle}>Welcome to Common Platform Knowledge Genie (CJS)</h1>
                                 </div>
                             : //else Ungrounded
                                 <div>
@@ -453,13 +502,13 @@ const Chat = () => {
                             {activeChatMode != ChatMode.Ungrounded &&
                                 <div>
                                     <h2 className={styles.chatEmptyStateSubtitle}>To access Common Platform guidance, click on one of the FAQs or ask your question in the dialogue box below</h2>
-                                    <ExampleList onExampleClicked={onExampleClicked} />
+                                    <ExampleList onExampleClicked={onExampleClicked} activeChatMode={activeChatMode} />
                                 </div>
                             }
                         </div>
                     ) : (
                         <div className={styles.chatMessageStream}>
-                            {answers.map((answer, index) => (
+                            {activeChatMode != ChatMode.TabularDataAssistant && answers.map((answer, index) => (
                                 <div key={index}>
                                     <UserChatMessage
                                         message={answer[0]}
@@ -493,7 +542,42 @@ const Chat = () => {
                                     </div>
                                 </div>
                             ))}
-                            {error ? (
+                            {activeChatMode == ChatMode.TabularDataAssistant && (
+                                <div>
+                                    <UserChatMessage
+                                        message={lastQuestionRef.current}
+                                        approach={defaultApproach}
+                                    />
+                                    <div className={styles.chatMessageGpt}>
+                                        <Stack className={`${styles.answerContainerWork}`} verticalAlign="space-between">
+                                            <Stack.Item>
+                                                <Stack horizontal horizontalAlign="space-between">
+                                                    <AnswerIcon approach={defaultApproach} />
+                                                </Stack>
+                                            </Stack.Item>
+                                            <Stack.Item grow>
+                                                <CharacterStreamer 		
+                                                    classNames={styles.answerText} 
+                                                    approach={defaultApproach} 
+                                                    onStreamingComplete={() => {}} 
+                                                    typingSpeed={10}
+                                                    nonEventString={tdaAnswer}  
+                                                />
+                                            </Stack.Item>
+                                            <Stack.Item>
+                                                <Stack horizontal wrap tokens={{ childrenGap: 5 }}>
+                                                    <br/>
+                                                    <span className={styles.citationLearnMore}>Citations:</span>		
+                                                    <span>
+                                                        <a title="CJS Codes" onClick={() => onShowCitation("CJS/cjs-offence-index-march-2024.csv/cjs-offence-index-march-2024.csv", "https://infoasststoreyhhhw.blob.core.windows.net/upload/CJS/cjs-offence-index-march-2024.csv?sp=r&st=2024-06-20T23:02:03Z&se=2024-07-31T07:02:03Z&spr=https&sv=2022-11-02&sr=b&sig=bMkJraCfcjpKuvPIswwjKAnQHO6QLSd5fNUY8%2BannBU%3D", "0", 0)}>CJS/cjs-offence-index-march-2024.csv</a>
+                                                    </span>
+                                                </Stack>
+                                            </Stack.Item>
+                                        </Stack>
+                                    </div>
+                                </div>
+                            )}
+                            {activeChatMode != ChatMode.TabularDataAssistant && error ? (
                                 <>
                                     <UserChatMessage message={lastQuestionRef.current} approach={activeApproach}/>
                                     <div className={styles.chatMessageGptMinWidth}>
@@ -515,22 +599,38 @@ const Chat = () => {
                                 }
                             </div> 
                         )}
-                        <QuestionInput
-                            clearOnSend
-                            placeholder="Type a new question (e.g. I am unable to download or print a court list where an application is listed in that courtroom, what should I do?)"
-                            disabled={isLoading}
-                            onSend={question => makeApiRequest(question, defaultApproach, {}, {}, {})}
-                            onAdjustClick={() => setIsConfigPanelOpen(!isConfigPanelOpen)}
-                            onInfoClick={() => setIsInfoPanelOpen(!isInfoPanelOpen)}
-                            showClearChat={true}
-                            onClearClick={clearChat}
-                            onRegenerateClick={() => makeApiRequest(lastQuestionRef.current, defaultApproach, {}, {}, {})}
-                            whoAmIData={whoAmIData}
-                        />
+                        {activeChatMode == ChatMode.TabularDataAssistant && (
+                            <QuestionInput
+                                clearOnSend
+                                placeholder="Type a new question (e.g. What is the Offence Code for Offence Title Burglary dwelling - with intent to steal)"
+                                disabled={isLoading}
+                                onSend={question => makeTdaApiRequest(question, defaultApproach)}
+                                onAdjustClick={() => setIsConfigPanelOpen(!isConfigPanelOpen)}
+                                onInfoClick={() => setIsInfoPanelOpen(!isInfoPanelOpen)}
+                                showClearChat={true}
+                                onClearClick={clearChat}
+                                onRegenerateClick={() => makeTdaApiRequest(lastQuestionRef.current, defaultApproach)}
+                                whoAmIData={whoAmIData}
+                            />
+                        )}
+                        {activeChatMode != ChatMode.TabularDataAssistant && (
+                            <QuestionInput
+                                clearOnSend
+                                placeholder="Type a new question (e.g. I am unable to download or print a court list where an application is listed in that courtroom, what should I do?)"
+                                disabled={isLoading}
+                                onSend={question => makeApiRequest(question, defaultApproach, {}, {}, {})}
+                                onAdjustClick={() => setIsConfigPanelOpen(!isConfigPanelOpen)}
+                                onInfoClick={() => setIsInfoPanelOpen(!isInfoPanelOpen)}
+                                showClearChat={true}
+                                onClearClick={clearChat}
+                                onRegenerateClick={() => makeApiRequest(lastQuestionRef.current, defaultApproach, {}, {}, {})}
+                                whoAmIData={whoAmIData}
+                            />
+                        )}
                     </div>
                 </div>
 
-                {answers.length > 0 && activeAnalysisPanelTab && (
+                {activeChatMode != ChatMode.TabularDataAssistant && answers.length > 0 && activeAnalysisPanelTab && (
                     <AnalysisPanel
                         className={styles.chatAnalysisPanel}
                         activeCitation={activeCitation}

@@ -2,7 +2,7 @@
 // Licensed under the MIT license.
 
 import { Button, ButtonGroup } from "react-bootstrap";
-import { ChatMode, GetFeatureFlagsResponse } from "../../api";
+import { ChatMode, GetFeatureFlagsResponse, GetWhoAmIResponse } from "../../api";
 
 import styles from "./ChatModeButtonGroup.module.css";
 
@@ -11,9 +11,10 @@ interface Props {
     featureFlags?: GetFeatureFlagsResponse;
     onClick: (_ev: any) => void;
     defaultValue?: ChatMode;
+    whoAmIData?: GetWhoAmIResponse
 }
 
-export const ChatModeButtonGroup = ({ className, onClick, defaultValue, featureFlags }: Props) => {
+export const ChatModeButtonGroup = ({ className, onClick, defaultValue, featureFlags, whoAmIData }: Props) => {
     return (
         <div className={`${styles.container} ${className ?? ""}`}>
             {// The WorkOnly button is always enabled, but WorkPlusWeb and Ungrounded are conditionally enabled based on feature flags
@@ -38,7 +39,10 @@ export const ChatModeButtonGroup = ({ className, onClick, defaultValue, featureF
                 </ButtonGroup>
             : // If neither WorkPlusWeb nor Ungrounded are enabled, show only WorkOnly button
                 <ButtonGroup className={`${styles.buttonGroup}`} onClick={onClick} bsPrefix="ia">
-                    <Button className={`${defaultValue == ChatMode.WorkOnly? styles.buttonmiddleactive : styles.buttonmiddle ?? ""}`} size="sm" value={0} bsPrefix='ia'>{"Common Platform Guidance Only"}</Button>
+                    <Button className={`${defaultValue == ChatMode.WorkOnly? styles.buttonleftactive : styles.buttonleft ?? ""}`} size="sm" value={0} bsPrefix='ia'>{"Common Platform SOPs and Guidance"}</Button>
+                    {whoAmIData?.USER_ROLES == "Admin" &&
+                        <Button className={`${defaultValue == ChatMode.TabularDataAssistant ? styles.buttonrightactive : styles.buttonright ?? ""}`} size="sm" value={3} bsPrefix='ia'>{"CJS Offence Code"}</Button>
+                    }
                 </ButtonGroup>
                 }
         </div>

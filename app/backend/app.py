@@ -125,7 +125,9 @@ log = logging.getLogger("uvicorn")
 log.setLevel('DEBUG')
 log.propagate = True
 
-dffinal = None
+#dffinal = None
+dffinal = pd.read_csv("data/cjs-offence-index-march-2024.csv")
+save_df(dffinal)
 # Used by the OpenAI SDK
 openai.api_type = "azure"
 openai.api_base = ENV["AZURE_OPENAI_ENDPOINT"]

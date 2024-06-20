@@ -313,10 +313,10 @@ export async function postTd(file: File): Promise<String> {
     return parsedResponse;
 }
 
-export async function processCsvAgentResponse(question: string, file: File, retries: number = 3): Promise<String> {
+export async function processCsvAgentResponse(question: string, file: File, retries: number = 3, signal: AbortSignal): Promise<String> {
     let lastError;
 
-    const formData = new FormData();
+    /*const formData = new FormData();
     formData.append('csv', file);
 
     const response = await fetch('/posttd', {
@@ -327,14 +327,15 @@ export async function processCsvAgentResponse(question: string, file: File, retr
     const parsedResponse: String = await response.text();
     if (response.status > 299 || !response.ok) {
         throw Error("Unknown error");
-    }
+    }*/
     for (let i = 0; i < retries; i++) {
         try {
             const response = await fetch(`/process_td_agent_response?question=${encodeURIComponent(question)}`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json"
-                }
+                },
+                signal: signal
             });
 
             const parsedResponse: String = await response.json();

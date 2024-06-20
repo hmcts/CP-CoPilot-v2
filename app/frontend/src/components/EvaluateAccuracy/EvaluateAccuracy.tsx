@@ -32,6 +32,8 @@ const dropdownTimespanOptions = [
     { key: AccuracyState.CORRECT, text: 'Correct' },
     { key: AccuracyState.INCORRECT, text: 'Incorrect' },
     { key: AccuracyState.PARTIAL, text: 'Partial' },
+    { key: AccuracyState.INVALID, text: 'Invalid Question' },
+    { key: AccuracyState.UNAVAILABLE, text: 'Unavailable Data' },
   ];
 
   const dropdownRowNumberOptions = [
@@ -372,6 +374,7 @@ export const EvaluateAccuracy = ({ className }: Props) => {
             // Handle the error here
             console.log(error);
         }
+        await onGetStatusClick();
         setStateDialogVisible(false);
     }
 
