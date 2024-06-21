@@ -235,7 +235,8 @@ export const enum AccuracyState {
     PARTIAL = "Partial",
     ALL = "All",
     INVALID = "Invalid Question",
-    UNAVAILABLE = "Unavailable Data"
+    UNAVAILABLE = "Unavailable Data",
+    REVIEW = "Review Response"
 }
 
 export type UserChatInteraction = {
@@ -260,4 +261,5 @@ export type UserFeedback = {
     REUSABILITY?: string;
     TIMESTAMP: string;
     error?: string;
+    COMMENT? : string
 };

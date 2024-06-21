@@ -3,7 +3,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Dropdown, DropdownMenuItemType, IDropdownOption, IDropdownStyles } from '@fluentui/react/lib/Dropdown';
-import { DefaultButton, DetailsList, DetailsListLayoutMode, Dialog, DialogFooter, DialogType, IColumn, ITextFieldStyleProps, ITextFieldStyles, Panel, PanelType, PrimaryButton, SelectionMode, Stack, TextField, TooltipHost } from "@fluentui/react";
+import { DefaultButton, DetailsList, DetailsListLayoutMode, Dialog, DialogFooter, DialogType, IColumn, ITextFieldStyleProps, ITextFieldStyles, Label, Panel, PanelType, PrimaryButton, SelectionMode, Stack, TextField, TooltipHost, Text } from "@fluentui/react";
 import { animated, useSpring } from "@react-spring/web";
 import { getAllUploadStatus, FileUploadBasicStatus, GetUploadStatusRequest, FileState, UserFeedback, getAllUserFeedback } from "../../api";
 
@@ -49,7 +49,9 @@ export const EvaluateFeedback = ({ className }: Props) => {
     const [selectedUser, setSelectedUser] = useState<string>('');
     const [selectedNumberOfRecordsItem, setSelectedNumberOfRecordsItem] = useState<number>(25);
     const [selectedProjectTeamItem, setSelectedProjectTeamItem] = useState<number>(1);
-
+    const [value, setValue] = useState<any>();
+    const [stateDialogVisible, setStateDialogVisible] = useState(false);
+    
 
     const [files, setFiles] = useState<UserFeedback[]>();
     const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -68,6 +70,20 @@ export const EvaluateFeedback = ({ className }: Props) => {
 
     const onProjectTeamChange = (event: React.FormEvent<HTMLDivElement>, item: IDropdownOption<any> | undefined): void => {
         setSelectedProjectTeamItem(parseInt(item?.key as string));
+    };
+
+    const refreshProp = (item: UserFeedback) => {
+        setValue(item);
+    };
+
+    const onStateColumnClick = (item: any) => {
+        try {
+            refreshProp(item);
+            setStateDialogVisible(true);
+        } catch (error) {
+            console.error("Error on column click:", error);
+            // Handle error here, perhaps show an error message to the user
+        }
     };
 
     const onColumnClick = (ev: React.MouseEvent<HTMLElement>, column: IColumn): void => {
@@ -279,6 +295,24 @@ export const EvaluateFeedback = ({ className }: Props) => {
             data: 'string',
             onColumnClick: onColumnClick,
             isPadded: true,
+        },
+        {
+            key: 'comment',
+            name: 'Comment',
+            fieldName: 'comment',
+            minWidth: 210,
+            maxWidth: 350,
+            isResizable: true,
+            ariaLabel: 'Comment',
+            onColumnClick: onColumnClick,
+            data: 'string',
+            onRender: (item: any) => (
+                <TooltipHost content={`${item.comment} `}>
+                    <span onClick={() => onStateColumnClick(item)} style={{ cursor: 'pointer' }}>
+                        {item.comment}
+                    </span>
+                </TooltipHost>
+            ), 
         }
     ]);
 
@@ -357,6 +391,21 @@ export const EvaluateFeedback = ({ className }: Props) => {
                         />
                         <span className={styles.footer}>{"(" + items.length as string + ") records."}</span>
                     </div>
+                    <Panel
+                        headerText="Status Log"
+                        isOpen={stateDialogVisible}
+                        isBlocking={false}
+                        onDismiss={() => setStateDialogVisible(false)}
+                        closeButtonAriaLabel="Close"
+                        onRenderFooterContent={() => <DefaultButton onClick={() => setStateDialogVisible(false)}>Close</DefaultButton>}
+                        isFooterAtBottom={true}
+                    >
+                        <div className={styles.resultspanel}>
+                            <div>
+                                <Label>Comment</Label><Text>{value?.comment}</Text>
+                            </div>
+                        </div>
+                    </Panel>
                 </div>
             )}
         </div>

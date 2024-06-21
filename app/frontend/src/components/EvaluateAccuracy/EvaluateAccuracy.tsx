@@ -34,6 +34,7 @@ const dropdownTimespanOptions = [
     { key: AccuracyState.PARTIAL, text: 'Partial' },
     { key: AccuracyState.INVALID, text: 'Invalid Question' },
     { key: AccuracyState.UNAVAILABLE, text: 'Unavailable Data' },
+    { key: AccuracyState.REVIEW, text: 'Review Response' },
   ];
 
   const dropdownRowNumberOptions = [

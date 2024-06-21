@@ -13,7 +13,7 @@ export type ExampleModel = {
 
 const CJSEXAMPLES: ExampleModel[] = [
     { text: "What is the Offence Code for Offence Title \"Assault by beating\"", value: "What is the Offence Code for Offence Title \"Assault by beating\"" },
-    { text: "List 7 Offence Codes and Offence Titles related to Legislation \"Theft Act 1968.\"", value: "List 7 Offence Codes and Offence Titles related to Legislation \"Theft Act 1968.\"" },
+    { text: "List all CJS offence codes where Legislation contains \"Section 9.* of the Theft Act 1968\"", value: "List all CJS offence codes where Legislation contains \"Section 9.* of the Theft Act 1968\"" },
     { text: "Show me the DVLA Code for \"Use a motor vehicle on a road / public place without third party insurance\"", value: "Show me the DVLA Code for \"Use a motor vehicle on a road / public place without third party insurance\"" }
 ];
 

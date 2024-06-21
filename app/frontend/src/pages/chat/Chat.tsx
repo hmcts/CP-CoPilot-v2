@@ -146,7 +146,11 @@ const Chat = () => {
     }
 
     const makeTdaApiRequest = async(question: string, approach: Approaches) => {
+        const start_timestamp = new Date().toISOString();
         lastQuestionRef.current = question;
+        lastQuestionWorkCitationRef.current = {};
+        lastQuestionWebCitiationRef.current = {};
+        lastQuestionThoughtChainRef.current = {};
         setActiveApproach(approach);
 
         error && setError(undefined);
@@ -154,19 +158,32 @@ const Chat = () => {
         setActiveCitation(undefined);
         setActiveAnalysisPanelTab(undefined);
 
-        const start_timestamp = new Date().toISOString();
-
         try {
             const controller = new AbortController();
             setAbortController(controller);
             const signal = controller.signal;
 
             const result = await processCsvAgentResponse(question, new File([], ""), 3, signal);
+            
+            const temp: ChatResponse = {
+                answer: result.toString(),
+                thoughts: "",
+                data_points: [],
+                approach: approach,
+                thought_chain: {
+                    "work_response": "",
+                    "web_response": ""
+                },
+                work_citation_lookup: {},
+                web_citation_lookup: {}
+            };
+            setAnswers([...answers, [question, temp]]);
+
             setTdaAnswer(result.toString());
             const end_timestamp = new Date().toISOString();
-            const userChatInteraction: UserChatInteraction = ({USER_ID: whoAmIData?.USER_ID, PROMPT: question, START_TIMESTAMP: start_timestamp, END_TIMESTAMP: end_timestamp, RESPONSE: result.toString(), CITATIONS: ["CJS/cjs-offence-index-march-2024.csv//cjs-offence-index-march-2024.csv"]})
+            const userChatInteraction: UserChatInteraction = ({USER_ID: whoAmIData?.USER_ID, PROMPT: question, START_TIMESTAMP: start_timestamp, END_TIMESTAMP: end_timestamp, RESPONSE: result.toString(), CITATIONS: ["CJS/cjs-offence-index-march-2024.csv/cjs-offence-index-march-2024.csv"]})
             setUserChatInteraction(userChatInteraction);
-            logUserChatInteraction(userChatInteraction);
+            logUserChatData(userChatInteraction);
         } catch (e) {
             setError(e);
         } finally {
@@ -549,13 +566,17 @@ const Chat = () => {
                                         approach={defaultApproach}
                                     />
                                     <div className={styles.chatMessageGpt}>
-                                        <Stack className={`${styles.answerContainerWork}`} verticalAlign="space-between">
+                                        <Stack className={styles.answerContainerWork} verticalAlign="space-between">
                                             <Stack.Item>
                                                 <Stack horizontal horizontalAlign="space-between">
                                                     <AnswerIcon approach={defaultApproach} />
                                                 </Stack>
                                             </Stack.Item>
+
                                             <Stack.Item grow>
+                                                <div className={styles.protectedBanner}>
+                                                    <ShieldCheckmark20Regular></ShieldCheckmark20Regular>Your personal and company data are protected
+                                                </div>
                                                 <CharacterStreamer 		
                                                     classNames={styles.answerText} 
                                                     approach={defaultApproach} 
@@ -564,15 +585,21 @@ const Chat = () => {
                                                     nonEventString={tdaAnswer}  
                                                 />
                                             </Stack.Item>
+                                            
                                             <Stack.Item>
                                                 <Stack horizontal wrap tokens={{ childrenGap: 5 }}>
                                                     <br/>
                                                     <span className={styles.citationLearnMore}>Citations:</span>		
                                                     <span>
-                                                        <a title="CJS Codes" onClick={() => onShowCitation("CJS/cjs-offence-index-march-2024.csv/cjs-offence-index-march-2024.csv", "https://infoasststoreyhhhw.blob.core.windows.net/upload/CJS/cjs-offence-index-march-2024.csv?sp=r&st=2024-06-20T23:02:03Z&se=2024-07-31T07:02:03Z&spr=https&sv=2022-11-02&sr=b&sig=bMkJraCfcjpKuvPIswwjKAnQHO6QLSd5fNUY8%2BannBU%3D", "0", 0)}>CJS/cjs-offence-index-march-2024.csv</a>
+                                                        <a className={styles.citationWork} title="CJS Codes" onClick={() => onShowCitation("CJS/cjs-offence-index-march-2024.csv/cjs-offence-index-march-2024.csv", "https://infoasststoreyhhhw.blob.core.windows.net/upload/CJS/cjs-offence-index-march-2024.csv?sp=r&st=2024-06-20T23:02:03Z&se=2024-07-31T07:02:03Z&spr=https&sv=2022-11-02&sr=b&sig=bMkJraCfcjpKuvPIswwjKAnQHO6QLSd5fNUY8%2BannBU%3D", "0", 0)}>CJS/cjs-offence-index-march-2024.csv</a>
                                                     </span>
                                                 </Stack>
                                             </Stack.Item>
+
+                                            <Stack.Item>
+                                                <div className={styles.raiwarning}>AI-generated content may be incorrect</div>
+                                            </Stack.Item>
+
                                         </Stack>
                                     </div>
                                 </div>
@@ -630,7 +657,7 @@ const Chat = () => {
                     </div>
                 </div>
 
-                {activeChatMode != ChatMode.TabularDataAssistant && answers.length > 0 && activeAnalysisPanelTab && (
+                {answers.length > 0 && activeAnalysisPanelTab && (
                     <AnalysisPanel
                         className={styles.chatAnalysisPanel}
                         activeCitation={activeCitation}

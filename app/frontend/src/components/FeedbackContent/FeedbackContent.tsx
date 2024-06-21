@@ -2,7 +2,7 @@
 // Licensed under the MIT license.
 
 import React, { useEffect, useState } from "react";
-import { Text } from "@fluentui/react";
+import { ITextFieldStyleProps, ITextFieldStyles, Text, TextField } from "@fluentui/react";
 import { Label } from '@fluentui/react/lib/Label';
 import { Separator } from '@fluentui/react/lib/Separator';
 import { getInfoData, GetInfoResponse, UserFeedback, GetWhoAmIResponse  } from "../../api";
@@ -70,6 +70,8 @@ export const FeedbackContent = ({ className, whoAmIData, onUserFeedback }: Props
     const [selectedResponseTimeItem, setSelectedResponseTimeItem] = useState<IDropdownOption>();
     const [selectedHelpfulItem, setSelectedHelpfulItem] = useState<IDropdownOption>();
     const [selectedReusabilityItem, setSelectedReusabilityItem] = useState<IDropdownOption>();
+    const [comment, setComment] = useState<string>('');
+    
 
     const onAccuracyChange = (event: React.FormEvent<HTMLDivElement>, item: IDropdownOption<any> | undefined): void => {
         setSelectedAccuracyItem(item);
@@ -89,6 +91,10 @@ export const FeedbackContent = ({ className, whoAmIData, onUserFeedback }: Props
 
     const onReusabilityChange = (event: React.FormEvent<HTMLDivElement>, item: IDropdownOption<any> | undefined): void => {
         setSelectedReusabilityItem(item);
+    };
+
+    const onCommentChange = (_ev?: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string) => {
+      setComment(newValue || "");
     };
 
     useEffect(() => {
@@ -124,10 +130,19 @@ export const FeedbackContent = ({ className, whoAmIData, onUserFeedback }: Props
         RESPONSE_TIME: selectedResponseTimeItem?.text, 
         HELPFUL: selectedHelpfulItem?.text,
         REUSABILITY: selectedReusabilityItem?.text,
-        TIMESTAMP: new Date().toISOString()
+        TIMESTAMP: new Date().toISOString(),
+        COMMENT: comment
       })
       onUserFeedback(userFeedbackData);
     });
+
+    function getStyles(props: ITextFieldStyleProps): Partial<ITextFieldStyles> {
+        return {
+          fieldGroup: [
+            { width: 250 },
+          ]
+        };
+    }
 
     return (
         <div>
@@ -181,6 +196,8 @@ export const FeedbackContent = ({ className, whoAmIData, onUserFeedback }: Props
                 aria-label="Reusability Options"
                 required
             />
+            <Separator>Comment</Separator>
+            <TextField label='Comment:' multiline resizable={true} styles={getStyles} onChange={onCommentChange}/>
             <br /><br />
             <button
               onClick={handleFeedback}

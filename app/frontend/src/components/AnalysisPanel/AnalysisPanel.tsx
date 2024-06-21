@@ -87,7 +87,7 @@ export const AnalysisPanel = ({ answer, activeTab, activeCitation, sourceFile, p
             }
         };
     
-        if (["json", "txt", "xml"].includes(sourceFileExt)) {
+        if (["json", "txt", "xml", "csv"].includes(sourceFileExt)) {
             fetchPlainTextContent();
         }
     }, [sourceFile, sourceFileExt]);
@@ -132,7 +132,7 @@ export const AnalysisPanel = ({ answer, activeTab, activeCitation, sourceFile, p
                         ) : sourceFileExt === "md" ? (
                             // Render Markdown content using react-markdown
                             <ReactMarkdown>{markdownContent}</ReactMarkdown>
-                        ) : ["json", "txt", "xml"].includes(sourceFileExt) ? (
+                        ) : ["json", "txt", "xml", "csv"].includes(sourceFileExt) ? (
                             // Render plain text content
                             <pre>{plainTextContent}</pre>
                         ) : (

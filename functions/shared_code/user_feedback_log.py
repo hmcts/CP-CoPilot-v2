@@ -32,7 +32,7 @@ class UserFeedbackLog:
             self.container = self.database.create_container(id=self._container_name,
                 partition_key=PartitionKey(path="/file_name"))
 
-    def upsert_document(self, user, accuracy, ease_of_use, response_time, helpful, reusability, timestamp):
+    def upsert_document(self, user, accuracy, ease_of_use, response_time, helpful, reusability, timestamp, comment):
         """ Function to upsert a user feedback for a specified id """
 
         # add to standard logger
@@ -48,7 +48,8 @@ class UserFeedbackLog:
                 "response_time": response_time,
                 "helpful": helpful,
                 "reusability": reusability,
-                "timestamp": timestamp
+                "timestamp": timestamp,
+                "comment": comment
             }
             self.container.upsert_item(body=json_document)
 
@@ -70,7 +71,7 @@ class UserFeedbackLog:
 
         query_string = "SELECT TOP " + str(num_of_records) + " c.id,  c.user, c.timestamp, \
             c.accuracy, c.ease_of_use, c.response_time, c.helpful, \
-            c.reusability FROM c"
+            c.reusability, c.comment FROM c"
 
         conditions = []
 

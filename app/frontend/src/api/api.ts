@@ -553,7 +553,8 @@ export async function logUserFeedback(user_feedback_data: UserFeedback | undefin
             "response_time": user_feedback_data?.RESPONSE_TIME,
             "helpful": user_feedback_data?.HELPFUL,
             "reusability": user_feedback_data?.REUSABILITY,
-            "timestamp": user_feedback_data?.TIMESTAMP
+            "timestamp": user_feedback_data?.TIMESTAMP,
+            "comment": user_feedback_data?.COMMENT
         })
     });
 

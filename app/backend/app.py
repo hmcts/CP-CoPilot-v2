@@ -925,8 +925,9 @@ async def logUserFeedback(request: Request):
         helpful = json_body.get("helpful")
         reusability = json_body.get("reusability")
         timestamp = json_body.get("timestamp")
+        comment = json_body.get("comment")
 
-        userFeedbackLog.upsert_document(user, accuracy, ease_of_use, response_time, helpful, reusability, timestamp)
+        userFeedbackLog.upsert_document(user, accuracy, ease_of_use, response_time, helpful, reusability, timestamp, comment)
 
     except Exception as ex:
         log.exception("Exception in /logstatus")
