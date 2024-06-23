@@ -159,14 +159,8 @@ const Chat = () => {
         setActiveAnalysisPanelTab(undefined);
 
         try {
-            const controller = new AbortController();
-            setAbortController(controller);
-            const signal = controller.signal;
-
-            const result = await processCsvAgentResponse(question, new File([], ""), 3, signal);
-            
             const temp: ChatResponse = {
-                answer: result.toString(),
+                answer: "",
                 thoughts: "",
                 data_points: [],
                 approach: approach,
@@ -179,6 +173,12 @@ const Chat = () => {
             };
             setAnswers([...answers, [question, temp]]);
 
+            const controller = new AbortController();
+            setAbortController(controller);
+            const signal = controller.signal;
+
+            const result = await processCsvAgentResponse(question, new File([], ""), 3, signal);
+            temp.answer = result.toString();
             setTdaAnswer(result.toString());
             const end_timestamp = new Date().toISOString();
             const userChatInteraction: UserChatInteraction = ({USER_ID: whoAmIData?.USER_ID, PROMPT: question, START_TIMESTAMP: start_timestamp, END_TIMESTAMP: end_timestamp, RESPONSE: result.toString(), CITATIONS: ["CJS/cjs-offence-index-march-2024.csv/cjs-offence-index-march-2024.csv"]})
@@ -559,17 +559,17 @@ const Chat = () => {
                                     </div>
                                 </div>
                             ))}
-                            {activeChatMode == ChatMode.TabularDataAssistant && (
+                            {activeChatMode == ChatMode.TabularDataAssistant && answers.map((answer, index) => (
                                 <div>
                                     <UserChatMessage
-                                        message={lastQuestionRef.current}
-                                        approach={defaultApproach}
+                                        message={answer[0]}
+                                        approach={answer[1].approach}
                                     />
                                     <div className={styles.chatMessageGpt}>
                                         <Stack className={styles.answerContainerWork} verticalAlign="space-between">
                                             <Stack.Item>
                                                 <Stack horizontal horizontalAlign="space-between">
-                                                    <AnswerIcon approach={defaultApproach} />
+                                                    <AnswerIcon approach={answer[1].approach} />
                                                 </Stack>
                                             </Stack.Item>
 
@@ -582,7 +582,7 @@ const Chat = () => {
                                                     approach={defaultApproach} 
                                                     onStreamingComplete={() => {}} 
                                                     typingSpeed={10}
-                                                    nonEventString={tdaAnswer}  
+                                                    nonEventString={answers[index][1].answer}  
                                                 />
                                             </Stack.Item>
                                             
@@ -603,7 +603,7 @@ const Chat = () => {
                                         </Stack>
                                     </div>
                                 </div>
-                            )}
+                            ))}
                             {activeChatMode != ChatMode.TabularDataAssistant && error ? (
                                 <>
                                     <UserChatMessage message={lastQuestionRef.current} approach={activeApproach}/>
