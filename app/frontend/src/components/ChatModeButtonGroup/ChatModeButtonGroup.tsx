@@ -40,11 +40,9 @@ export const ChatModeButtonGroup = ({ className, onClick, defaultValue, featureF
             : // If neither WorkPlusWeb nor Ungrounded are enabled, show only WorkOnly button
                 <ButtonGroup className={`${styles.buttonGroup}`} onClick={onClick} bsPrefix="ia">
                     <Button className={`${defaultValue == ChatMode.WorkOnly? styles.buttonleftactive : styles.buttonleft ?? ""}`} size="sm" value={0} bsPrefix='ia'>{"Common Platform SOPs and Guidance"}</Button>
-                    {whoAmIData?.USER_ROLES == "Admin" &&
-                        <Button className={`${defaultValue == ChatMode.TabularDataAssistant ? styles.buttonrightactive : styles.buttonright ?? ""}`} size="sm" value={3} bsPrefix='ia'>{"CJS Offence Code"}</Button>
-                    }
+                    <Button className={`${defaultValue == ChatMode.TabularDataAssistant ? styles.buttonrightactive : styles.buttonright ?? ""}`} size="sm" value={3} bsPrefix='ia'>{"CJS Offence Code"}</Button>
                 </ButtonGroup>
-                }
+            }
         </div>
     );
 };
